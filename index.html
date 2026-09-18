@@ -1,68 +1,1284 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Deutsch Jetzt! — learn German A1 to B2, one daily episode at a time.">
-<meta name="theme-color" content="#0f766e">
-<title>Deutsch Jetzt! — A1 → B2, one day at a time</title>
-<link rel="manifest" href="manifest.json">
-<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="css/style.css">
-</head>
-<body>
-<header class="app-header">
-  <div class="brand">
-    <span class="brand-mark" aria-hidden="true">DJ</span>
-    <div>
-      <h1>Deutsch Jetzt!</h1>
-      <p class="tagline">A1 → B2 · one episode a day</p>
-    </div>
-  </div>
-  <div class="streak-pill" id="streakPill" title="Day streak">
-    <span class="flame" aria-hidden="true">&#9733;</span>
-    <span id="streakCount">0</span>
-  </div>
-</header>
-
-<nav class="tabbar" role="tablist" aria-label="Main navigation">
-  <button class="tab active" data-view="today" role="tab" aria-selected="true">Today</button>
-  <button class="tab" data-view="review" role="tab" aria-selected="false">Review <span class="badge" id="dueBadge">0</span></button>
-  <button class="tab" data-view="progress" role="tab" aria-selected="false">Progress</button>
-  <button class="tab" data-view="calendar" role="tab" aria-selected="false">Calendar</button>
-</nav>
-
-<main id="app" aria-live="polite">
-  <!-- views rendered here -->
-</main>
-
-<!-- Exercise session overlay -->
-<div class="overlay hidden" id="sessionOverlay" role="dialog" aria-modal="true" aria-labelledby="sessionTitle">
-  <div class="session-card">
-    <div class="session-top">
-      <span id="sessionTitle" class="session-type">Exercise</span>
-      <div class="session-progress"><div class="session-progress-bar" id="sessionBar"></div></div>
-      <button class="icon-btn" id="quitSession" aria-label="Quit session">&#10005;</button>
-    </div>
-    <div id="sessionBody" class="session-body"></div>
-    <div id="sessionFeedback" class="session-feedback" aria-live="polite"></div>
-    <div class="session-actions" id="sessionActions"></div>
+<html style="margin:0;padding:0;">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+(function(){
+  var s = document.createElement('style');
+  s.textContent = ':root{--bg:#faf9f4;--card:#ffffff;--text:#0f172a;--muted:#64748b;--accent:#297a2e;--accent-soft:rgba(41,122,46,.14);--accent2:#d97706;--accent2-soft:rgba(217,119,6,.14);--border:rgba(15,23,42,.08);--good:#297a2e;--bad:#c0392b;--bad-soft:rgba(192,57,43,.12);--blue:#2d6b8a;--blue-soft:rgba(45,107,138,.12);--pink:#ba3b5b;--pink-soft:rgba(186,59,91,.12);--teal:#0d9488;--teal-soft:rgba(13,148,136,.12);--slate:#5b6472;--slate-soft:rgba(91,100,114,.12);--purple:#7c3aed;--purple-soft:rgba(124,58,237,.12)}'
+    +'@keyframes pop{0%{transform:scale(.92);opacity:0}100%{transform:scale(1);opacity:1}}'
+    +'@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}'
+    +'@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}'
+    +'@keyframes pulseGlow{0%,100%{box-shadow:0 0 0 0 rgba(217,119,6,.4)}50%{box-shadow:0 0 0 10px rgba(217,119,6,0)}}'
+    +'@keyframes wave{0%,100%{transform:scaleY(.4)}50%{transform:scaleY(1)}}'
+    +'.pop{animation:pop .25s ease}.shake{animation:shake .4s ease}.fadeUp{animation:fadeUp .4s ease both}'
+    +'.opt-btn{transition:transform .12s ease,background .15s ease,border-color .15s ease,color .15s ease}'
+    +'.opt-btn:hover:not(:disabled){transform:translateY(-2px);border-color:var(--accent)}'
+    +'.opt-btn:active:not(:disabled){transform:scale(.97)}'
+    +'.opt-btn:disabled{cursor:default}'
+    +'.mission-card{transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease;cursor:pointer}'
+    +'.mission-card:hover{transform:translateY(-3px);box-shadow:0 10px 24px rgba(0,0,0,.08)}'
+    +'.speak-btn{transition:transform .12s ease,background .15s ease}'
+    +'.speak-btn:hover{transform:scale(1.1);background:var(--accent-soft)}'
+    +'.newbest{animation:pulseGlow 1.6s ease infinite}'
+    +'.wave-bar{display:inline-block;width:4px;margin:0 2px;border-radius:2px;background:var(--teal);animation:wave 1s ease-in-out infinite}'
+    +'.law-chip{font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;padding:2px 7px;border-radius:8px;}'
+    +'input[type=text]{outline:none;transition:border-color .15s ease,box-shadow .15s ease}'
+    +'input[type=text]:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}'
+    +'.stat-bar{height:10px;border-radius:6px;overflow:hidden;background:rgba(128,128,128,.1);}'
+    +'.stat-fill{height:100%;border-radius:6px;transition:width .6s ease;}';
+  document.head.appendChild(s);
+})();
+</script>
+<div style="background-color:transparent;box-sizing:border-box;">
+  <div style="color:var(--text);font-family:'Fredoka',sans-serif;background:radial-gradient(700px 400px at 50% -5%, var(--accent-soft), transparent 60%), var(--bg);">
+    <div id="app" style="max-width:480px;margin:0 auto;padding:24px 16px 48px;"></div>
   </div>
 </div>
 
-<div class="toast hidden" id="toast" role="status"></div>
-
-<script src="data/lessons.js"></script>
-<script src="data/lessons_2.js"></script>
-<script src="js/storage.js"></script>
-<script src="js/srs.js"></script>
-<script src="js/audio.js"></script>
-<script src="js/exercises.js"></script>
-<script src="js/app.js"></script>
 <script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{}));
+(function(){
+  // ============ CORE DATA ============
+  var DATA = {
+    "cards": [
+      {"w": "Hund", "a": "der", "en": "dog", "url": "https://p16-flow-image-sign.ibyteimg.com/tos-mya-i-3rsxbfecgb/rc_gen_image/d2f8dadcc84a47329d886d82aa863d4a.jpeg~tplv-0es2k971ck-image.image"},
+      {"w": "Katze", "a": "die", "en": "cat", "url": "https://p16-flow-image-sign.ibyteimg.com/tos-mya-i-3rsxbfecgb/rc_gen_image/8d8318b60f5d4d488bc6e38bfbe85571.jpeg~tplv-0es2k971ck-image.image"},
+      {"w": "Haus", "a": "das", "en": "house", "url": "https://p16-flow-image-sign.ibyteimg.com/tos-mya-i-3rsxbfecgb/rc_gen_image/dc46069772cb4e5c9136f276c4eb2b9b.jpeg~tplv-0es2k971ck-image.image"},
+      {"w": "Apfel", "a": "der", "en": "apple", "url": "https://p16-flow-image-sign.ibyteimg.com/tos-mya-i-3rsxbfecgb/rc_gen_image/8da91bb74cce476c8c464f89c5d59a31.jpeg~tplv-0es2k971ck-image.image"},
+      {"w": "Brot", "a": "das", "en": "bread", "url": "https://p16-flow-image-sign.ibyteimg.com/tos-mya-i-3rsxbfecgb/rc_gen_image/0e6b06074af34bc698ce647051080c26.jpeg~tplv-0es2k971ck-image.image"},
+      {"w": "Sonne", "a": "die", "en": "sun", "url": "https://p16-flow-image-sign.ibyteimg.com/tos-mya-i-3rsxbfecgb/rc_gen_image/c5422fc481f14187b9ac9ae6039a81a6.jpeg~tplv-0es2k971ck-image.image"},
+      {"w": "Buch", "a": "das", "en": "book", "url": "https://p16-flow-image-sign.ibyteimg.com/tos-mya-i-3rsxbfecgb/rc_gen_image/aa2cc65128a34c7bb14e5cb4875e6f05.jpeg~tplv-0es2k971ck-image.image"},
+      {"w": "Auto", "a": "das", "en": "car", "url": "https://p16-flow-image-sign.ibyteimg.com/tos-mya-i-3rsxbfecgb/rc_gen_image/87985dc2d5dd45af86af2c3162ced9f0.jpeg~tplv-0es2k971ck-image.image"}
+    ],
+    "words": [],
+    "verbs": [
+      ["sein","to be"],["haben","to have"],["werden","to become"],["können","can"],
+      ["müssen","must"],["wollen","to want"],["sollen","should"],["dürfen","to be allowed"],
+      ["mögen","to like"],["machen","to do"],["gehen","to go"],["kommen","to come"],
+      ["sehen","to see"],["sagen","to say"],["sprechen","to speak"],["reden","to talk"],
+      ["wissen","to know"],["kennen","to know"],["denken","to think"],["glauben","to believe"],
+      ["finden","to find"],["suchen","to search"],["geben","to give"],["nehmen","to take"],
+      ["bringen","to bring"],["holen","to fetch"],["schicken","to send"],["bekommen","to receive"],
+      ["stehen","to stand"],["liegen","to lie"],["sitzen","to sit"],["hängen","to hang"],
+      ["steigen","to climb"],["fallen","to fall"],["fahren","to drive"],["fliegen","to fly"],
+      ["laufen","to run"],["rennen","to sprint"],["gehen","to walk"],["wandern","to hike"],
+      ["springen","to jump"],["klettern","to climb"],["schwimmen","to swim"],["tauchen","to dive"],
+      ["essen","to eat"],["trinken","to drink"],["kochen","to cook"],["backen","to bake"],
+      ["braten","to fry"],["schmecken","to taste"],["riechen","to smell"],["fühlen","to feel"],
+      ["berühren","to touch"],["hören","to hear"],["zuhören","to listen"],["schlafen","to sleep"],
+      ["träumen","to dream"],["aufwachen","to wake"],["aufstehen","to get up"],["arbeiten","to work"],
+      ["schaffen","to create"],["verdienen","to earn"],["lernen","to learn"],["lehren","to teach"],
+      ["studieren","to study"],["unterrichten","to teach"],["lesen","to read"],["schreiben","to write"],
+      ["zeichnen","to draw"],["malen","to paint"],["rechnen","to calculate"],["zählen","to count"],
+      ["messen","to measure"],["wiegen","to weigh"],["fragen","to ask"],["antworten","to answer"],
+      ["erklären","to explain"],["beschreiben","to describe"],["verstehen","to understand"],["erkennen","to recognize"],
+      ["bemerken","to notice"],["helfen","to help"],["unterstützen","to support"],["danken","to thank"],
+      ["entschuldigen","to excuse"],["bitten","to request"],["grüßen","to greet"],["verabschieden","to say goodbye"],
+      ["küssen","to kiss"],["umarmen","to hug"],["heiraten","to marry"],["lieben","to love"],
+      ["hassen","to hate"],["gefallen","to please"],["lachen","to laugh"],["lächeln","to smile"],
+      ["weinen","to cry"],["schreien","to scream"],["rufen","to call"],["flüstern","to whisper"],
+      ["schweigen","to be silent"],["kaufen","to buy"],["verkaufen","to sell"],["bezahlen","to pay"],
+      ["kosten","to cost"],["sparen","to save"],["ausgeben","to spend"],["leihen","to lend"],
+      ["öffnen","to open"],["schließen","to close"],["anfangen","to begin"],["beginnen","to start"],
+      ["aufhören","to stop"],["beenden","to finish"],["enden","to end"],["fortsetzen","to continue"],
+      ["vergessen","to forget"],["erinnern","to remind"],["tragen","to carry"],["heben","to lift"],
+      ["ziehen","to pull"],["drücken","to push"],["werfen","to throw"],["fangen","to catch"],
+      ["halten","to hold"],["lassen","to let"],["legen","to lay"],["stellen","to place"],
+      ["setzen","to set"],["stecken","to stick"],["waschen","to wash"],["putzen","to clean"],
+      ["reinigen","to cleanse"],["wischen","to wipe"],["kehren","to sweep"],["saugen","to vacuum"],
+      ["bügeln","to iron"],["nähen","to sew"],["schneiden","to cut"],["teilen","to divide"],
+      ["trennen","to separate"],["verbinden","to connect"],["kleben","to glue"],["reparieren","to repair"],
+      ["bauen","to build"],["zerstören","to destroy"],["brechen","to break"],["verbrennen","to burn"],
+      ["schmelzen","to melt"],["frieren","to freeze"],["kochen","to boil"],["gießen","to pour"],
+      ["tropfen","to drip"],["fließen","to flow"],["steigen","to rise"],["sinken","to sink"],
+      ["wachsen","to grow"],["entwickeln","to develop"],["ändern","to change"],["verbessern","to improve"],
+      ["planen","to plan"],["organisieren","to organize"],["vorbereiten","to prepare"],["leiten","to lead"],
+      ["führen","to guide"],["folgen","to follow"],["begleiten","to accompany"],["treffen","to meet"],
+      ["begegnen","to encounter"],["besuchen","to visit"],["einladen","to invite"],["warten","to wait"],
+      ["bleiben","to stay"],["verlassen","to leave"],["zurückkehren","to return"],["ankommen","to arrive"],
+      ["abfahren","to depart"],["einsteigen","to board"],["aussteigen","to exit"],["reisen","to travel"],
+      ["brauchen","to need"],["benutzen","to use"],["verwenden","to use"],["verlieren","to lose"],
+      ["entdecken","to discover"],["gewinnen","to win"],["kämpfen","to fight"],["streiten","to argue"],
+      ["verteidigen","to defend"],["angreifen","to attack"],["fliehen","to flee"],["retten","to save"],
+      ["dienen","to serve"],["gehorchen","to obey"],["befehlen","to command"],["verbieten","to forbid"],
+      ["erlauben","to allow"],["zwingen","to force"],["drohen","to threaten"],["warnen","to warn"],
+      ["schützen","to protect"],["bewahren","to preserve"],["verstecken","to hide"],["zeigen","to show"],
+      ["entdecken","to uncover"],["herstellen","to manufacture"],["produzieren","to produce"],["entwerfen","to design"],
+      ["erfinden","to invent"],["funktionieren","to work"],["stoppen","to stop"],["bremsen","to brake"],
+      ["steuern","to control"],["regieren","to govern"],["herrschen","to rule"],["verwalten","to administer"],
+      ["entscheiden","to decide"],["wählen","to choose"],["bestimmen","to determine"],["prüfen","to test"],
+      ["kontrollieren","to check"],["beweisen","to prove"],["definieren","to define"],["berichten","to report"],
+      ["informieren","to inform"],["mitteilen","to communicate"],["äußern","to express"],["übersetzen","to translate"],
+      ["nachdenken","to reflect"],["überlegen","to consider"],["zweifeln","to doubt"],["hoffen","to hope"],
+      ["wünschen","to wish"],["genießen","to enjoy"],["trauern","to mourn"],["leiden","to suffer"],
+      ["ärgern","to annoy"],["fürchten","to fear"],["erschrecken","to frighten"],["beruhigen","to calm"],
+      ["trösten","to comfort"],["erwachen","to awaken"],["atmen","to breathe"],["husten","to cough"],
+      ["niesen","to sneeze"],["schlucken","to swallow"],["beißen","to bite"],["kauen","to chew"],
+      ["schauen","to watch"],["starren","to stare"],["wohnen","to reside"],["leben","to live"],
+      ["sterben","to die"],["gebären","to give birth"],["aufwachsen","to grow up"],["erziehen","to raise"],
+      ["bilden","to educate"],["üben","to practice"],["wiederholen","to repeat"],["bestehen","to pass"]
+    ],
+    "adjectives": [
+      ["gut","good"],["schlecht","bad"],["groß","big"],["klein","small"],["lang","long"],["kurz","short"],
+      ["hoch","high"],["niedrig","low"],["breit","wide"],["schmal","narrow"],["dick","thick"],["dünn","thin"],
+      ["schwer","heavy"],["leicht","light"],["stark","strong"],["schwach","weak"],["schnell","fast"],["langsam","slow"],
+      ["früh","early"],["spät","late"],["neu","new"],["alt","old"],["jung","young"],["modern","modern"],
+      ["schön","beautiful"],["hässlich","ugly"],["hübsch","pretty"],["reich","rich"],["arm","poor"],["teuer","expensive"],
+      ["billig","cheap"],["kalt","cold"],["warm","warm"],["heiß","hot"],["kühl","cool"],["trocken","dry"],
+      ["nass","wet"],["feucht","humid"],["hell","bright"],["dunkel","dark"],["klar","clear"],["trüb","cloudy"],
+      ["laut","loud"],["leise","quiet"],["still","silent"],["sauber","clean"],["schmutzig","dirty"],["voll","full"],
+      ["leer","empty"],["offen","open"],["geschlossen","closed"],["frei","free"],["besetzt","occupied"],["richtig","correct"],
+      ["falsch","wrong"],["wahr","true"],["wichtig","important"],["nötig","necessary"],["möglich","possible"],["unmöglich","impossible"],
+      ["einfach","simple"],["schwierig","difficult"],["kompliziert","complicated"],["interessant","interesting"],["langweilig","boring"],["spannend","exciting"],
+      ["glücklich","happy"],["traurig","sad"],["zufrieden","content"],["froh","glad"],["enttäuscht","disappointed"],["begeistert","enthusiastic"],
+      ["freundlich","friendly"],["unfreundlich","unfriendly"],["höflich","polite"],["unhöflich","rude"],["nett","nice"],["gemein","mean"],
+      ["böse","evil"],["klug","clever"],["dumm","stupid"],["weise","wise"],["naiv","naive"],["tapfer","brave"],
+      ["feige","cowardly"],["mutig","courageous"],["ängstlich","fearful"],["fleißig","diligent"],["faul","lazy"],["aktiv","active"],
+      ["passiv","passive"],["ruhig","calm"],["nervös","nervous"],["gelassen","relaxed"],["aufgeregt","excited"],["stolz","proud"],
+      ["bescheiden","modest"],["eitel","vain"],["demütig","humble"],["ehrlich","honest"],["verlogen","dishonest"],["aufrichtig","sincere"],
+      ["geduldig","patient"],["ungeduldig","impatient"],["großzügig","generous"],["geizig","stingy"],["gierig","greedy"],["neidisch","envious"],
+      ["eifersüchtig","jealous"],["verheiratet","married"],["ledig","single"],["geschieden","divorced"],["schwanger","pregnant"],["krank","sick"],
+      ["gesund","healthy"],["verletzt","injured"],["müde","tired"],["wach","awake"],["erschöpft","exhausted"],["hungrig","hungry"],
+      ["satt","full"],["durstig","thirsty"],["betrunken","drunk"],["nüchtern","sober"],["tot","dead"],["lebendig","alive"],
+      ["bereit","ready"],["fähig","capable"],["unfähig","incapable"],["begabt","talented"],["erfahren","experienced"],["unerfahren","inexperienced"],
+      ["kompetent","competent"],["inkompetent","incompetent"],["bekannt","known"],["unbekannt","unknown"],["berühmt","famous"],["beliebt","popular"],
+      ["unbeliebt","unpopular"],["ähnlich","similar"],["gleich","equal"],["verschieden","different"],["einzigartig","unique"],["gewöhnlich","ordinary"],
+      ["besonders","special"],["selten","rare"],["häufig","frequent"],["regelmäßig","regular"],["üblich","usual"],["merkwürdig","strange"],
+      ["frisch","fresh"],["verdorben","rotten"],["reif","ripe"],["roh","raw"],["gekocht","cooked"],["süß","sweet"],
+      ["sauer","sour"],["bitter","bitter"],["salzig","salty"],["scharf","spicy"],["mild","mild"],["köstlich","delicious"],
+      ["weich","soft"],["hart","hard"],["fest","firm"],["flüssig","liquid"],["glatt","smooth"],["rau","rough"],
+      ["rund","round"],["eckig","angular"],["quadratisch","square"],["oval","oval"],["gerade","straight"],["krumm","curved"]
+    ],
+    "adverbs": [
+      ["hier","here"],["dort","there"],["da","there"],["überall","everywhere"],["nirgends","nowhere"],["irgendwo","somewhere"],
+      ["oben","above"],["unten","below"],["vorne","in front"],["hinten","behind"],["links","left"],["rechts","right"],
+      ["innen","inside"],["außen","outside"],["nah","near"],["weit","far"],["früh","early"],["spät","late"],
+      ["jetzt","now"],["dann","then"],["bald","soon"],["gestern","yesterday"],["heute","today"],["morgen","tomorrow"],
+      ["vorgestern","day before yesterday"],["übermorgen","day after tomorrow"],["immer","always"],["nie","never"],["manchmal","sometimes"],["oft","often"],
+      ["selten","rarely"],["meistens","mostly"],["wieder","again"],["schon","already"],["noch","still"],["gerade","just now"],
+      ["sofort","immediately"],["gleich","right away"],["später","later"],["damals","back then"],["neulich","recently"],["kürzlich","lately"],
+      ["vorher","before"],["nachher","afterwards"],["zuerst","first"],["zuletzt","lastly"],["schließlich","finally"],["plötzlich","suddenly"],
+      ["leise","quietly"],["laut","loudly"],["deutlich","clearly"],["kaum","barely"],["fast","almost"],["beinahe","nearly"],
+      ["etwa","approximately"],["ungefähr","roughly"],["genau","exactly"],["sogar","even"],["nur","only"],["auch","also"],
+      ["ebenfalls","likewise"],["außerdem","besides"],["sonst","otherwise"],["deshalb","therefore"],["deswegen","for that reason"],["trotzdem","nevertheless"],
+      ["allerdings","however"],["jedoch","yet"],["vielleicht","perhaps"],["möglicherweise","possibly"],["wahrscheinlich","probably"],["sicher","certainly"],
+      ["bestimmt","definitely"],["natürlich","of course"],["selbstverständlich","obviously"],["unbedingt","absolutely"],["gern","gladly"],["ungern","reluctantly"],
+      ["zusammen","together"],["getrennt","separately"],["allein","alone"],["gemeinsam","jointly"],["viel","much"],["wenig","little"],
+      ["mehr","more"],["weniger","less"],["genug","enough"],["etwas","a bit"],["ziemlich","quite"],["sehr","very"],
+      ["äußerst","extremely"],["besonders","especially"],["hauptsächlich","mainly"],["teilweise","partly"],["völlig","completely"],["ganz","entirely"],
+      ["hoffentlich","hopefully"],["leider","unfortunately"],["glücklicherweise","fortunately"]
+    ],
+    "sentences": [
+      ["Hello!","Hallo!"],["Good morning!","Guten Morgen!"],["Good day!","Guten Tag!"],["Good evening!","Guten Abend!"],
+      ["Good night!","Gute Nacht!"],["Goodbye!","Auf Wiedersehen!"],["See you soon!","Bis bald!"],["See you tomorrow!","Bis morgen!"],
+      ["How are you?","Wie geht es Ihnen?"],["I'm well, thanks.","Mir geht es gut, danke."],["Not so well.","Nicht so gut."],
+      ["What's new?","Was gibt es Neues?"],["Thank you!","Danke!"],["Thank you very much!","Dankeschön!"],["You're welcome.","Bitte!"],
+      ["Excuse me!","Entschuldigung!"],["I'm sorry!","Es tut mir leid!"],["It's okay.","Das macht nichts!"],["Please.","Bitte."],
+      ["Yes, gladly.","Ja, gern."],["No, thank you.","Nein, danke."],["Certainly!","Natürlich!"],["Pardon?","Wie bitte?"],
+      ["Could you repeat that?","Können Sie das wiederholen?"],["Please speak slowly.","Bitte sprechen Sie langsam."],
+      ["I don't understand.","Ich verstehe nicht."],["I understand a little.","Ich verstehe ein bisschen."],
+      ["What does that mean?","Was bedeutet das?"],["How do you say ... in German?","Wie sagt man ... auf Deutsch?"],
+      ["Have a nice day!","Schönen Tag noch!"],["Good luck!","Viel Glück!"],["All the best!","Alles Gute!"],
+      ["My name is ...","Ich heiße ..."],["What is your name?","Wie heißen Sie?"],["I come from ...","Ich komme aus ..."],
+      ["Where are you from?","Woher kommen Sie?"],["I live in ...","Ich wohne in ..."],["Where do you live?","Wo wohnen Sie?"],
+      ["I am ... years old.","Ich bin ... Jahre alt."],["How old are you?","Wie alt sind Sie?"],["I work as ...","Ich arbeite als ..."],
+      ["What do you do?","Was machen Sie beruflich?"],["I am married.","Ich bin verheiratet."],["I am single.","Ich bin ledig."],
+      ["I have two children.","Ich habe zwei Kinder."],["I speak a little German.","Ich spreche ein bisschen Deutsch."],
+      ["Do you speak English?","Sprechen Sie Englisch?"],["I am learning German.","Ich lerne Deutsch."],
+      ["How much does that cost?","Wie viel kostet das?"],["That's too expensive.","Das ist zu teuer."],
+      ["I would like ..., please.","Ich möchte ..., bitte."],["Do you have ...?","Haben Sie ...?"],["I'll take it.","Ich nehme das."],
+      ["Can I pay by card?","Kann ich mit Karte bezahlen?"],["The bill, please.","Die Rechnung, bitte."],
+      ["I'd like a coffee.","Ich hätte gern einen Kaffee."],["Without sugar, please.","Ohne Zucker, bitte."],
+      ["A table for two, please.","Einen Tisch für zwei, bitte."],["The food tastes good.","Das Essen schmeckt gut."],
+      ["Enjoy your meal!","Guten Appetit!"],["I'm vegetarian.","Ich bin Vegetarier."],["Where is the restroom?","Wo ist die Toilette?"],
+      ["Where is the station?","Wo ist der Bahnhof?"],["How do I get to the center?","Wie komme ich zum Zentrum?"],
+      ["Go straight ahead.","Gehen Sie geradeaus."],["Then left.","Dann links."],["Then right.","Dann rechts."],
+      ["When does the train leave?","Wann fährt der Zug ab?"],["The train arrives at eight.","Der Zug kommt um acht Uhr an."],
+      ["I have an appointment.","Ich habe einen Termin."],["I cannot come today.","Ich kann heute nicht kommen."],
+      ["Can we meet tomorrow?","Können wir uns morgen treffen?"],["Does ten o'clock work?","Passt es um zehn Uhr?"],
+      ["I am on vacation.","Ich bin im Urlaub."],["Where is the hotel?","Wo ist das Hotel?"],["I have a reservation.","Ich habe eine Reservierung."],
+      ["A single room, please.","Ein Einzelzimmer, bitte."],["I am ill.","Ich bin krank."],["I need a doctor.","Ich brauche einen Arzt."],
+      ["My head hurts.","Mir tut der Kopf weh."],["I have a headache.","Ich habe Kopfschmerzen."],["I have a stomach ache.","Ich habe Bauchschmerzen."],
+      ["I have a fever.","Ich habe Fieber."],["I have a cold.","Ich bin erkältet."],["Could you help me?","Können Sie mir helfen?"],
+      ["Call an ambulance!","Rufen Sie einen Krankenwagen!"],["I need medicine.","Ich brauche Medikamente."],
+      ["What time is it?","Wie viel Uhr ist es?"],["It is three o'clock.","Es ist drei Uhr."],["I get up at seven.","Ich stehe um sieben auf."],
+      ["I go to bed at eleven.","Ich gehe um elf schlafen."],["Today is Monday.","Heute ist Montag."],["Tomorrow is Tuesday.","Morgen ist Dienstag."],
+      ["The weather is nice today.","Das Wetter ist heute schön."],["It is raining.","Es regnet."],["It is snowing.","Es schneit."],
+      ["The sun is shining.","Die Sonne scheint."],["I am tired.","Ich bin müde."],["I am hungry.","Ich habe Hunger."],
+      ["I am thirsty.","Ich habe Durst."],["I am happy.","Ich bin glücklich."],["I am sad.","Ich bin traurig."],["I am excited.","Ich bin aufgeregt."],
+      ["I eat bread.","Ich esse Brot."],["You are tall.","Du bist groß."],["We drink water.","Wir trinken Wasser."],
+      ["The child reads a book.","Das Kind liest ein Buch."],["I come from Germany.","Ich komme aus Deutschland."],
+      ["She has a cat.","Sie hat eine Katze."],["I see the dog.","Ich sehe den Hund."],["We are in the city.","Wir sind in der Stadt."],
+      ["I love music.","Ich liebe Musik."],["I drink coffee.","Ich trinke Kaffee."],["He plays football.","Er spielt Fußball."],
+      ["We speak German.","Wir sprechen Deutsch."],["I buy a newspaper.","Ich kaufe eine Zeitung."],
+      ["The woman gives the child a book.","Die Frau gibt dem Kind ein Buch."],["I help the man.","Ich helfe dem Mann."],
+      ["I see the woman.","Ich sehe die Frau."],["I know the man.","Ich kenne den Mann."],
+      ["We go to the market.","Wir gehen zum Markt."],["I am in school.","Ich bin in der Schule."],
+      ["I go to the cinema.","Ich gehe ins Kino."],["The book lies on the table.","Das Buch liegt auf dem Tisch."],
+      ["I put the book on the table.","Ich lege das Buch auf den Tisch."],
+      ["Yesterday I went to Berlin.","Gestern bin ich nach Berlin gefahren."],
+      ["Yesterday I ate bread.","Gestern habe ich Brot gegessen."],
+      ["I can speak German.","Ich kann Deutsch sprechen."],["I must go home.","Ich muss nach Hause gehen."],
+      ["I want to learn German.","Ich möchte Deutsch lernen."],["I should sleep more.","Ich sollte mehr schlafen."],
+      ["Because I am sick, I stay home.","Weil ich krank bin, bleibe ich zu Hause."],
+      ["When I have time, I read.","Wenn ich Zeit habe, lese ich."],
+      ["I am flying tomorrow.","Ich fliege morgen."],["I work in IT.","Ich arbeite in der IT."],
+      ["I have a visa for Germany.","Ich habe ein Visum für Deutschland."],
+      ["I don't know the German language.","Ich kenne die deutsche Sprache nicht."],
+      ["I like reading books.","Ich lese gerne Bücher."],["I like drinking tea.","Ich trinke gerne Tee."],
+      ["The apartment has two rooms.","Die Wohnung hat zwei Zimmer."],
+      ["My hobby is music.","Mein Hobby ist Musik."],["We meet on the weekend.","Wir treffen uns am Wochenende."]
+    ],
+    "grammar": [
+      ["___ Mann ist groß.",["der","die","das"],"der","der Mann (masc. nominative)","der Mann","Artikel"],
+      ["___ Frau ist klug.",["die","der","das"],"die","die Frau (fem. nominative)","die Frau","Artikel"],
+      ["___ Kind spielt.",["das","der","die"],"das","das Kind (neut. nominative)","das Kind","Artikel"],
+      ["___ Kinder spielen.",["Die","Der","Das"],"Die","plural article = die","die Kinder","Artikel"],
+      ["Ich sehe ___ Mann.",["den","dem","der"],"den","sehen + accusative masc. → den Mann","den Mann","Akkusativ"],
+      ["Ich sehe ___ Frau.",["die","der","den"],"die","sehen + accusative fem. → die Frau","die Frau","Akkusativ"],
+      ["Ich sehe ___ Kind.",["das","den","dem"],"das","sehen + accusative neut. → das Kind","das Kind","Akkusativ"],
+      ["Ich helfe ___ Mann.",["dem","den","der"],"dem","helfen + dative masc. → dem Mann","dem Mann","Dativ"],
+      ["Ich helfe ___ Frau.",["der","die","den"],"der","helfen + dative fem. → der Frau","der Frau","Dativ"],
+      ["Ich helfe ___ Kind.",["dem","den","der"],"dem","helfen + dative neut. → dem Kind","dem Kind","Dativ"],
+      ["Ich gebe ___ Mann das Buch.",["dem","den","der"],"dem","geben + dative object → dem Mann","dem Mann","Dativ"],
+      ["Ich gebe ___ Frau das Buch.",["der","die","den"],"der","geben + dative fem. → der Frau","der Frau","Dativ"],
+      ["Du ___ groß.",["bist","bin","ist"],"bist","du bist (sein)","du bist","Konjugation"],
+      ["Wir ___ Wasser.",["haben","hast","hat"],"haben","wir haben (haben)","wir haben","Konjugation"],
+      ["Er ___ einen Apfel.",["isst","esst","esse"],"isst","er isst (essen)","er isst","Konjugation"],
+      ["Sie (plural) ___ Deutsch.",["sprechen","sprichst","spricht"],"sprechen","sie (plural) = sprechen","sie sprechen","Konjugation"],
+      ["Ich ___ Deutsch.",["spreche","sprichst","spricht"],"spreche","ich spreche (regular)","ich spreche","Konjugation"],
+      ["Du ___ Deutsch.",["sprichst","spreche","spricht"],"sprichst","du sprichst (irregular)","du sprichst","Konjugation"],
+      ["Er ___ Deutsch.",["spricht","spreche","sprichst"],"spricht","er spricht (irregular)","er spricht","Konjugation"],
+      ["Ich ___ nach Hause.",["gehe","gehst","geht"],"gehe","ich gehe (regular)","ich gehe","Konjugation"],
+      ["Wir ___ nach Hause.",["gehen","geht","gehst"],"gehen","wir gehen","wir gehen","Konjugation"],
+      ["Gestern ___ ich nach Berlin gefahren.",["bin","habe","ist"],"bin","fahren uses sein in Perfekt","bin gefahren","Perfekt"],
+      ["Gestern ___ ich Brot gegessen.",["habe","bin","hat"],"habe","essen uses haben in Perfekt","habe gegessen","Perfekt"],
+      ["Er ___ nach Hause gegangen.",["ist","hat","war"],"ist","gehen uses sein in Perfekt","ist gegangen","Perfekt"],
+      ["Wir ___ gestern im Kino gewesen.",["sind","haben","waren"],"sind","sein uses sein in Perfekt","sind gewesen","Perfekt"],
+      ["Ich ___ das Buch gelesen.",["habe","bin","hatte"],"habe","lesen uses haben in Perfekt","habe gelesen","Perfekt"],
+      ["Sie ___ einen Brief geschrieben.",["hat","ist","hatte"],"hat","schreiben uses haben","hat geschrieben","Perfekt"],
+      ["Ich ___ Gitarre spielen.",["kann","kannst","können"],"kann","ich kann (können)","kann spielen","Modalverben"],
+      ["Du ___ nach Hause gehen.",["musst","muss","müssen"],"musst","du musst (müssen)","musst gehen","Modalverben"],
+      ["Wir ___ Deutsch lernen.",["wollen","wollt","will"],"wollen","wir wollen (wollen)","wollen lernen","Modalverben"],
+      ["___ du mir helfen?",["Kannst","Kann","Können"],"Kannst","du kannst (können)","kannst du","Modalverben"],
+      ["Ich ___ das machen.",["muss","musst","müssen"],"muss","ich muss (müssen)","muss machen","Modalverben"],
+      ["Ich bin ___ Schule.",["in der","in den","ins"],"in der","location → dative: in der Schule","in der Schule","Präpositionen"],
+      ["Ich gehe ___ Kino.",["ins","in der","im"],"ins","direction → accusative: ins Kino","ins Kino","Präpositionen"],
+      ["Ich komme ___ Deutschland.",["aus","von","nach"],"aus","origin → aus","aus Deutschland","Präpositionen"],
+      ["Wir gehen ___ Markt.",["zum","zu den","nach"],"zum","zu + dative → zum Markt","zum Markt","Präpositionen"],
+      ["Wir gehen ___ Schule.",["zur","zum","nach"],"zur","zu + dative fem. → zur Schule","zur Schule","Präpositionen"],
+      ["Wir fahren ___ Berlin.",["nach","zu","in"],"nach","cities take nach","nach Berlin","Präpositionen"],
+      ["Ich wohne ___ Berlin.",["in","nach","zu"],"in","location → in Berlin","in Berlin","Präpositionen"],
+      ["Das Buch liegt ___ Tisch.",["auf dem","auf den","auf der"],"auf dem","location → dative","auf dem Tisch","Wechselpräpositionen"],
+      ["Ich lege das Buch ___ Tisch.",["auf den","auf dem","auf der"],"auf den","direction → accusative","auf den Tisch","Wechselpräpositionen"],
+      ["Ich fahre ___ Auto.",["mit dem","mit den","mit der"],"mit dem","mit + dative neut.","mit dem Auto","Präpositionen"],
+      ["Weil ich krank bin, ___ ich zu Hause.",["bleibe","bleiben","bleibt"],"bleibe","weil-clause: verb last","bleibe ich","Wortstellung"],
+      ["Wenn ich Zeit habe, ___ ich.",["lese","lesen","liest"],"lese","wenn-clause: verb last","lese ich","Wortstellung"],
+      ["Ich glaube, dass er ___ kommt.",["morgen","kommen","morgen kommt"],"morgen","dass-clause: verb at end","morgen kommt","Wortstellung"],
+      ["Ich habe ___ Hund.",["einen","einer","eine"],"einen","haben + accusative masc.","einen Hund","Adjektiv"],
+      ["Ich habe ___ Katze.",["eine","einen","einer"],"eine","haben + accusative fem.","eine Katze","Adjektiv"],
+      ["Ich habe ___ Buch.",["ein","einen","einer"],"ein","haben + accusative neut.","ein Buch","Adjektiv"],
+      ["Das ist ___ gute Mann.",["ein","einer","eine"],"ein","nominative masc.","ein guter Mann","Adjektiv"],
+      ["Ich sehe ___ gute Mann.",["einen","ein","einem"],"einen","accusative masc.","einen guten Mann","Adjektiv"],
+      ["Ich gebe ___ guten Mann das Buch.",["dem","den","der"],"dem","dative masc.","dem guten Mann","Adjektiv"],
+      ["Die ___ Frau ist klug.",["kluge","klugen","kluger"],"kluge","weak adjective after definite article","die kluge Frau","Adjektiv"],
+      ["Ich sehe die ___ Frau.",["kluge","klugen","kluger"],"kluge","accusative fem. after die","die kluge Frau","Adjektiv"],
+      ["Ich helfe der ___ Frau.",["klugen","kluge","kluger"],"klugen","dative fem. after der","der klugen Frau","Adjektiv"],
+      ["Das ___ Kind spielt.",["kleine","kleinen","kleiner"],"kleine","weak neut. after das","das kleine Kind","Adjektiv"],
+      ["Er hat ___ Geld.",["kein","keine","keinen"],"kein","kein + neut accusative","kein Geld","Negation"],
+      ["Ich habe ___ Zeit.",["keine","kein","keinen"],"keine","kein + fem accusative","keine Zeit","Negation"],
+      ["Ich habe ___ Bruder.",["keinen","kein","keine"],"keinen","kein + masc accusative","keinen Bruder","Negation"]
+    ],
+    "compounds": [
+      ["Handschuh","Hand = hand","Schuh = shoe","glove",["hand-shoe","shoe store","hat"]],
+      ["Baumhaus","Baum = tree","Haus = house","treehouse",["forest","wooden table","bird nest"]],
+      ["Kindergarten","Kinder = children","Garten = garden","preschool",["kids garden","playground","school yard"]],
+      ["Autobahn","Auto = car","Bahn = track","highway",["car track","bus station","driveway"]],
+      ["Fernseher","fern = far","Seher = seer","television",["far-seer","telescope","window"]],
+      ["Sonnenschein","Sonne = sun","Schein = shine","sunshine",["sun glasses","sunday","sunrise"]],
+      ["Schulbuch","Schul = school","Buch = book","textbook",["school bag","library","notebook"]],
+      ["Brieftasche","Brief = letter","Tasche = bag","wallet",["mailbox","postman","envelope"]],
+      ["Haustier","Haus = house","Tier = animal","pet",["house animal","farm","zoo"]],
+      ["Kaffeetasse","Kaffee = coffee","Tasse = cup","coffee mug",["coffee pot","café","spoon"]],
+      ["Sonnenblume","Sonne = sun","Blume = flower","sunflower",["rose","sunlight","daisy"]],
+      ["Schwimmbad","schwimmen = swim","Bad = bath","swimming pool",["bathtub","ocean","beach"]],
+      ["Lippenstift","Lippen = lips","Stift = pen","lipstick",["pencil","lip balm","crayon"]],
+      ["Flugzeug","Flug = flight","Zeug = thing","airplane",["airport","helicopter","rocket"]],
+      ["Staubsauger","Staub = dust","sauger = sucker","vacuum cleaner",["broom","mop","dustpan"]],
+      ["Kühlschrank","kühl = cool","Schrank = cupboard","refrigerator",["freezer","oven","cabinet"]],
+      ["Wörterbuch","Wörter = words","Buch = book","dictionary",["encyclopedia","novel","textbook"]],
+      ["Fahrrad","Fahr = drive","Rad = wheel","bicycle",["motorcycle","car","tricycle"]],
+      ["Fußball","Fuß = foot","Ball = ball","soccer",["basketball","tennis","volleyball"]],
+      ["Geburtstag","Geburt = birth","Tag = day","birthday",["anniversary","holiday","weekday"]],
+      ["Hausaufgabe","Haus = house","Aufgabe = task","homework",["housework","chore","assignment"]],
+      ["Regenschirm","Regen = rain","Schirm = screen","umbrella",["raincoat","sunshade","tent"]],
+      ["Zahnbürste","Zahn = tooth","Bürste = brush","toothbrush",["comb","hairbrush","floss"]],
+      ["Krankenwagen","Kranken = sick","Wagen = car","ambulance",["taxi","police car","fire truck"]],
+      ["Lebensmittel","Leben = life","Mittel = means","groceries",["medicine","clothing","furniture"]],
+      ["Schreibtisch","schreiben = write","Tisch = table","desk",["bookshelf","chair","cabinet"]],
+      ["Weinglas","Wein = wine","Glas = glass","wine glass",["bottle","cup","mug"]],
+      ["Hausmeister","Haus = house","Meister = master","janitor",["housewife","caretaker","mayor"]],
+      ["Nachmittag","nach = after","Mittag = noon","afternoon",["morning","evening","midnight"]],
+      ["Schlafzimmer","Schlaf = sleep","Zimmer = room","bedroom",["living room","kitchen","office"]],
+      ["Wohnzimmer","Wohn = live","Zimmer = room","living room",["bedroom","kitchen","study"]],
+      ["Badezimmer","Bade = bath","Zimmer = room","bathroom",["bedroom","kitchen","hallway"]],
+      ["Kinderzimmer","Kinder = children","Zimmer = room","kids' room",["bedroom","kitchen","office"]],
+      ["Wochenende","Woche = week","Ende = end","weekend",["weekday","midweek","holiday"]],
+      ["Nachttisch","Nacht = night","Tisch = table","nightstand",["bed","lamp","dresser"]]
+    ]
+  };
+
+  // ============ EXTENDED WORD BANK (batch 1) ============
+  var EXTRA_WORDS = [
+["Aktie","die","share"],["Börse","die","stock exchange"],["Bilanz","die","balance sheet"],["Budget","das","budget"],
+["Buchhalter","der","accountant"],["Darlehen","das","loan"],["Dividende","die","dividend"],["Einzahlung","die","deposit"],
+["Auszahlung","die","withdrawal"],["Einnahme","die","revenue"],["Ausgabe","die","expense"],["Ersparnis","die","savings"],
+["Umsatz","der","turnover"],["Kapital","das","capital"],["Kredit","der","credit"],["Zins","der","interest"],
+["Rendite","die","yield"],["Währung","die","currency"],["Wechselkurs","der","exchange rate"],["Überweisung","die","transfer"],
+["Scheck","der","check"],["Quittung","die","receipt"],["Beleg","der","voucher"],["Rabatt","der","discount"],
+["Zoll","der","customs"],["Versicherung","die","insurance"],["Police","die","policy"],["Prämie","die","premium"],
+["Klausel","die","clause"],["Anhang","der","addendum"],["Unterschrift","die","signature"],["Stempel","der","stamp"],
+["Siegel","das","seal"],["Lieferant","der","supplier"],["Hersteller","der","manufacturer"],["Händler","der","dealer"],
+["Makler","der","broker"],["Agent","der","agent"],["Konkurrent","der","competitor"],["Konkurrenz","die","competition"],
+["Monopol","das","monopoly"],["Marktanteil","der","market share"],["Zielgruppe","die","target group"],["Anzeige","die","advertisement"],
+["Plakat","das","poster"],["Kampagne","die","campaign"],["Slogan","der","slogan"],["Marke","die","brand"],
+["Logo","das","logo"],["Verpackung","die","packaging"],["Lieferung","die","delivery"],["Bestellung","die","order"],
+["Auftrag","der","commission"],["Angebot","das","offer"],["Nachfrage","die","demand"],["Lager","das","warehouse"],
+["Vorrat","der","stock"],["Waren","die","goods"],["Produkt","das","product"],["Artikel","der","article"],
+["Qualität","die","quality"],["Menge","die","quantity"],["Maß","das","measure"],["Standard","der","standard"],
+["Norm","die","norm"],["Zertifikat","das","certificate"],["Patent","das","patent"],["Lizenz","die","license"],
+["Gründung","die","foundation"],["Gründer","der","founder"],["Übernahme","die","takeover"],["Fusion","die","merger"],
+["Insolvenz","die","insolvency"],["Bankrott","der","bankruptcy"],["Pleite","die","bankruptcy"],["Rezession","die","recession"],
+["Inflation","die","inflation"],["Deflation","die","deflation"],["Boom","der","boom"],["Wachstum","das","growth"],
+["Rückgang","der","decline"],["Investition","die","investment"],["Investor","der","investor"],["Risiko","das","risk"],
+["Gewinnspanne","die","margin"],["Kosten","die","costs"],["Ausgaben","die","expenditure"],["Einnahmen","die","income"],
+["Haushalt","der","budget"],["Defizit","das","deficit"],["Überschuss","der","surplus"],["Subvention","die","subsidy"],
+["Zuschuss","der","grant"],["Fonds","der","fund"],["Anleihe","die","bond"],["Wertpapier","das","security"],
+["Spekulation","die","speculation"],["Aktienmarkt","der","stock market"],["Wechselstube","die","exchange office"],["Geldautomat","der","ATM"],
+["Bankkonto","das","bank account"],["Sparkonto","das","savings account"],["Girokonto","das","checking account"],["Kontonummer","die","account number"],
+["Bankleitzahl","die","routing number"],["Bargeld","das","cash"],["Geldschein","der","banknote"],["Wechselgeld","das","change"],
+["Trinkgeld","das","tip"],["Preisnachlass","der","rebate"],["Sonderangebot","das","special offer"],["Ausverkauf","der","sale"],
+["Auktion","die","auction"],["Versteigerung","die","auction"],["Gebot","das","bid"],["Erwerb","der","acquisition"],
+["Eigentum","das","property"],["Besitz","der","possession"],["Vermögen","das","wealth"],["Erbe","das","inheritance"],
+["Testament","das","will"],["Vormund","der","guardian"],["Stiftung","die","foundation"],["Spende","die","donation"],
+["Wohltätigkeit","die","charity"],["Gesetz","das","law"],["Verfassung","die","constitution"],["Verordnung","die","regulation"],
+["Vorschrift","die","rule"],["Bestimmung","die","provision"],["Paragraph","der","paragraph"],["Absatz","der","paragraph"],
+["Änderung","die","amendment"],["Zusatz","der","addition"],["Gericht","das","court"],["Richter","der","judge"],
+["Anwalt","der","lawyer"],["Staatsanwalt","der","prosecutor"],["Verteidiger","der","defender"],["Kläger","der","plaintiff"],
+["Angeklagte","der","defendant"],["Zeuge","der","witness"],["Aussage","die","testimony"],["Beweis","der","evidence"],
+["Urteil","das","verdict"],["Geldstrafe","die","fine"],["Haft","die","custody"],["Gefängnis","das","prison"],
+["Zelle","die","cell"],["Häftling","der","prisoner"],["Bewährung","die","probation"],["Begnadigung","die","pardon"],
+["Amnestie","die","amnesty"],["Berufung","die","appeal"],["Revision","die","revision"],["Prozess","der","trial"],
+["Verhandlung","die","hearing"],["Anhörung","die","hearing"],["Verhör","das","interrogation"],["Verhaftung","die","arrest"],
+["Festnahme","die","arrest"],["Durchsuchung","die","search"],["Haftbefehl","der","warrant"],["Anklage","die","indictment"],
+["Beschuldigung","die","accusation"],["Verbrechen","das","crime"],["Vergehen","das","offense"],["Verbrecher","der","criminal"],
+["Täter","der","perpetrator"],["Opfer","das","victim"],["Mord","der","murder"],["Totschlag","der","manslaughter"],
+["Diebstahl","der","theft"],["Raub","der","robbery"],["Einbruch","der","burglary"],["Betrug","der","fraud"],
+["Unterschlagung","die","embezzlement"],["Fälschung","die","forgery"],["Erpressung","die","extortion"],["Entführung","die","kidnapping"],
+["Vergewaltigung","die","rape"],["Körperverletzung","die","assault"],["Beleidigung","die","insult"],["Verleumdung","die","defamation"],
+["Drohung","die","threat"],["Drogenhandel","der","drug trafficking"],["Schmuggel","der","smuggling"],["Geldwäsche","die","money laundering"],
+["Korruption","die","corruption"],["Bestechung","die","bribery"],["Amtsmissbrauch","der","abuse of office"],["Regierung","die","government"],
+["Parlament","das","parliament"],["Bundestag","der","federal parliament"],["Bundesrat","der","federal council"],["Ministerium","das","ministry"],
+["Minister","der","minister"],["Kanzler","der","chancellor"],["Abgeordnete","der","representative"],["Wahl","die","election"],
+["Wähler","der","voter"],["Partei","die","party"],["Koalition","die","coalition"],["Opposition","die","opposition"],
+["Mehrheit","die","majority"],["Minderheit","die","minority"],["Sitz","der","seat"],["Debatte","die","debate"],
+["Antrag","der","motion"],["Beschluss","der","resolution"],["Gesetzentwurf","der","bill"],["Veto","das","veto"],
+["Amtszeit","die","term"],["Kabinett","das","cabinet"],["Botschafter","der","ambassador"],["Diplomat","der","diplomat"],
+["Botschaft","die","embassy"],["Konsulat","das","consulate"],["Abkommen","das","agreement"],["Gipfel","der","summit"],
+["Kompromiss","der","compromise"],["Sanktion","die","sanction"],["Embargo","das","embargo"],["Krieg","der","war"],
+["Frieden","der","peace"],["Konflikt","der","conflict"],["Armee","die","army"],["Militär","das","military"],
+["Truppe","die","troop"],["Soldat","der","soldier"],["Offizier","der","officer"],["General","der","general"],
+["Hauptmann","der","captain"],["Leutnant","der","lieutenant"],["Feldwebel","der","sergeant"],["Regiment","das","regiment"],
+["Bataillon","das","battalion"],["Division","die","division"],["Brigade","die","brigade"],["Kompanie","die","company"],
+["Waffe","die","weapon"],["Gewehr","das","rifle"],["Pistole","die","pistol"],["Granate","die","grenade"],
+["Bombe","die","bomb"],["Rakete","die","missile"],["Panzer","der","tank"],["Artillerie","die","artillery"],
+["Munition","die","ammunition"],["Kugel","die","bullet"],["Patrone","die","cartridge"],["Mine","die","mine"],
+["Schwert","das","sword"],["Dolch","der","dagger"],["Bajonett","das","bayonet"],["Rüstung","die","armor"],
+["Schild","der","shield"],["Uniform","die","uniform"],["Abzeichen","das","badge"],["Kaserne","die","barracks"],
+["Stützpunkt","der","base"],["Front","die","front"],["Schlacht","die","battle"],["Gefecht","das","combat"],
+["Angriff","der","attack"],["Verteidigung","die","defense"],["Rückzug","der","retreat"],["Belagerung","die","siege"],
+["Sieg","der","victory"],["Niederlage","die","defeat"],["Waffenstillstand","der","armistice"],["Kapitulation","die","surrender"],
+["Friedensvertrag","der","peace treaty"],["Bündnis","das","alliance"],["Verbündete","der","ally"],["Feind","der","enemy"],
+["Gegner","der","opponent"],["Spion","der","spy"],["Spionage","die","espionage"],["Geheimdienst","der","intelligence service"],
+["Veteran","der","veteran"],["Kriegsgefangene","der","POW"],["Verwundete","der","wounded"],["Gefallene","der","fallen soldier"],
+["Held","der","hero"],["Tapferkeit","die","bravery"],["Orden","der","medal"],["Auszeichnung","die","decoration"],
+["Beförderung","die","promotion"],["Wissenschaft","die","science"],["Forschung","die","research"],["Forscher","der","researcher"],
+["Wissenschaftler","der","scientist"],["Labor","das","laboratory"],["Experiment","das","experiment"],["Versuch","der","attempt"],
+["Test","der","test"],["Probe","die","sample"],["Hypothese","die","hypothesis"],["Theorie","die","theory"],
+["Prinzip","das","principle"],["Methode","die","method"],["Analyse","die","analysis"],["Ergebnis","das","result"],
+["Daten","die","data"],["Statistik","die","statistics"],["Wahrscheinlichkeit","die","probability"],["Formel","die","formula"],
+["Gleichung","die","equation"],["Berechnung","die","calculation"],["Messung","die","measurement"],["Einheit","die","unit"],
+["Maßstab","der","scale"],["Atom","das","atom"],["Molekül","das","molecule"],["Element","das","element"],
+["Verbindung","die","compound"],["Reaktion","die","reaction"],["Energie","die","energy"],["Materie","die","matter"],
+["Stoff","der","substance"],["Gas","das","gas"],["Flüssigkeit","die","liquid"],["Feststoff","der","solid"],
+["Teilchen","das","particle"],["Welle","die","wave"],["Strahlung","die","radiation"],["Licht","das","light"],
+["Schall","der","sound"],["Wärme","die","heat"],["Kälte","die","cold"],["Druck","der","pressure"],
+["Kraft","die","force"],["Bewegung","die","motion"],["Geschwindigkeit","die","speed"],["Beschleunigung","die","acceleration"],
+["Gravitation","die","gravity"],["Magnetismus","der","magnetism"],["Elektrizität","die","electricity"],["Spannung","die","voltage"],
+["Strom","der","current"],["Widerstand","der","resistance"],["Leiter","der","conductor"],["Biologie","die","biology"],
+["Organismus","der","organism"],["Gen","das","gene"],["Chromosom","das","chromosome"],["Evolution","die","evolution"],
+["Art","die","species"],["Gattung","die","genus"],["Ökosystem","das","ecosystem"],["Umwelt","die","environment"],
+["Klima","das","climate"],["Atmosphäre","die","atmosphere"],["Temperatur","die","temperature"],["Feuchtigkeit","die","humidity"],
+["Chemie","die","chemistry"],["Säure","die","acid"],["Base","die","base"],["Salz","das","salt"],
+["Metall","das","metal"],["Legierung","die","alloy"],["Physik","die","physics"],["Mathematik","die","mathematics"],
+["Geometrie","die","geometry"],["Algebra","die","algebra"],["Geologie","die","geology"],["Astronomie","die","astronomy"],
+["Planet","der","planet"],["Stern","der","star"],["Galaxie","die","galaxy"],["Universum","das","universe"],
+["Kosmos","der","cosmos"],["Teleskop","das","telescope"],["Mikroskop","das","microscope"],["Satellit","der","satellite"],
+["Sonde","die","probe"],["These","die","thesis"],["Dissertation","die","dissertation"],["Publikation","die","publication"],
+["Fachzeitschrift","die","journal"],["Konferenz","die","conference"],["Symposium","das","symposium"],["Vortrag","der","lecture"],
+["Seminar","das","seminar"],["Vorlesung","die","lecture"],["Professor","der","professor"],["Dozent","der","lecturer"],
+["Doktorand","der","PhD student"],["Stipendium","das","scholarship"],["Förderung","die","funding"],["Sport","der","sport"],
+["Mannschaft","die","team"],["Spieler","der","player"],["Trainer","der","coach"],["Kapitän","der","captain"],
+["Torwart","der","goalkeeper"],["Verteidiger","der","defender"],["Stürmer","der","striker"],["Schiedsrichter","der","referee"],
+["Spiel","das","game"],["Wettkampf","der","competition"],["Turnier","das","tournament"],["Meisterschaft","die","championship"],
+["Liga","die","league"],["Saison","die","season"],["Halbzeit","die","halftime"],["Verlängerung","die","overtime"],
+["Elfmeter","der","penalty"],["Freistoß","der","free kick"],["Ecke","die","corner"],["Abseits","das","offside"],
+["Foul","das","foul"],["Tor","das","goal"],["Punkt","der","point"],["Satz","der","set"],
+["Runde","die","round"],["Finale","das","final"],["Halbfinale","das","semifinal"],["Viertelfinale","das","quarterfinal"],
+["Tabelle","die","standings"],["Rekord","der","record"],["Medaille","die","medal"],["Pokal","der","trophy"],
+["Urkunde","die","certificate"],["Preis","der","prize"],["Basketball","der","basketball"],["Handball","der","handball"],
+["Volleyball","der","volleyball"],["Tischtennis","das","table tennis"],["Badminton","das","badminton"],["Golf","das","golf"],
+["Hockey","das","hockey"],["Eishockey","das","ice hockey"],["Rugby","das","rugby"],["Baseball","der","baseball"],
+["Boxen","das","boxing"],["Ringen","das","wrestling"],["Judo","das","judo"],["Karate","das","karate"],
+["Taekwondo","das","taekwondo"],["Fechten","das","fencing"],["Rudern","das","rowing"],["Segeln","das","sailing"],
+["Surfen","das","surfing"],["Marathon","der","marathon"],["Sprint","der","sprint"],["Hochsprung","der","high jump"],
+["Weitsprung","der","long jump"],["Stabhochsprung","der","pole vault"],["Diskuswerfen","das","discus throw"],["Speerwerfen","das","javelin"],
+["Kugelstoßen","das","shot put"],["Mountainbiking","das","mountain biking"],["Snowboarden","das","snowboarding"],["Eiskunstlauf","der","figure skating"],
+["Rodeln","das","luge"],["Turnen","das","gymnastics"],["Yoga","das","yoga"],["Pilates","das","pilates"],
+["Aerobic","das","aerobics"],["Fitness","die","fitness"],["Bodybuilding","das","bodybuilding"],["Gewichtheben","das","weightlifting"],
+["Klettern","das","climbing"],["Bergsteigen","das","mountaineering"],["Reiten","das","horseback riding"],["Jagen","das","hunting"],
+["Bogenschießen","das","archery"],["Stadion","das","stadium"],["Arena","die","arena"],["Halle","die","hall"],
+["Bahn","die","track"],["Becken","das","pool"],["Rasen","der","lawn"],["Tribüne","die","grandstand"],
+["Ball","der","ball"],["Schläger","der","racket"],["Netz","das","net"],["Korb","der","basket"],
+["Puck","der","puck"],["Ski","der","ski"],["Snowboard","das","snowboard"],["Schlittschuh","der","ice skate"],
+["Trikot","das","jersey"],["Musik","die","music"],["Musiker","der","musician"],["Komponist","der","composer"],
+["Dirigent","der","conductor"],["Orchester","das","orchestra"],["Chor","der","choir"],["Band","die","band"],
+["Ensemble","das","ensemble"],["Sänger","der","singer"],["Instrument","das","instrument"],["Klavier","das","piano"],
+["Flügel","der","grand piano"],["Orgel","die","organ"],["Keyboard","das","keyboard"],["Gitarre","die","guitar"],
+["Bass","der","bass"],["Violine","die","violin"],["Bratsche","die","viola"],["Cello","das","cello"],
+["Kontrabass","der","double bass"],["Harfe","die","harp"],["Flöte","die","flute"],["Klarinette","die","clarinet"],
+["Oboe","die","oboe"],["Saxophon","das","saxophone"],["Trompete","die","trumpet"],["Posaune","die","trombone"],
+["Horn","das","horn"],["Tuba","die","tuba"],["Trommel","die","drum"],["Pauke","die","timpani"],
+["Becken","das","cymbal"],["Xylophon","das","xylophone"],["Akkordeon","das","accordion"],["Mundharmonika","die","harmonica"],
+["Blockflöte","die","recorder"],["Note","die","note"],["Noten","die","sheet music"],["Takt","der","bar"],
+["Melodie","die","melody"],["Harmonie","die","harmony"],["Rhythmus","der","rhythm"],["Ton","der","tone"],
+["Klang","der","sound"],["Stimme","die","voice"],["Lied","das","song"],["Hymne","die","anthem"],
+["Ballade","die","ballad"],["Oper","die","opera"],["Operette","die","operetta"],["Musical","das","musical"],
+["Konzert","das","concert"],["Auftritt","der","performance"],["Bühne","die","stage"],["Probe","die","rehearsal"],
+["Aufnahme","die","recording"],["Album","das","album"],["Single","die","single"],["Hit","der","hit"],
+["Komposition","die","composition"],["Arrangement","das","arrangement"],["Text","der","lyrics"],["Kunst","die","art"],
+["Künstler","der","artist"],["Maler","der","painter"],["Bildhauer","der","sculptor"],["Fotograf","der","photographer"],
+["Designer","der","designer"],["Architekt","der","architect"],["Gemälde","das","painting"],["Zeichnung","die","drawing"],
+["Skizze","die","sketch"],["Skulptur","die","sculpture"],["Statue","die","statue"],["Fresko","das","fresco"],
+["Mosaik","das","mosaic"],["Druck","der","print"],["Radierung","die","etching"],["Aquarell","das","watercolor"],
+["Ölgemälde","das","oil painting"],["Porträt","das","portrait"],["Landschaft","die","landscape"],["Stillleben","das","still life"],
+["Realismus","der","realism"],["Impressionismus","der","impressionism"],["Moderne","die","modernism"],["Barock","der","baroque"],
+["Renaissance","die","renaissance"],["Galerie","die","gallery"],["Museum","das","museum"],["Ausstellung","die","exhibition"],
+["Vernissage","die","opening"],["Kurator","der","curator"],["Sammlung","die","collection"],["Rahmen","der","frame"],
+["Leinwand","die","canvas"],["Palette","die","palette"],["Pinsel","der","brush"],["Farbe","die","paint"],
+["Ölfarbe","die","oil paint"],["Acryl","das","acrylic"],["Kohle","die","charcoal"],["Pastell","das","pastel"],
+["Grafik","die","graphic art"],["Illustration","die","illustration"],["Comic","der","comic"],["Cartoon","der","cartoon"],
+["Karikatur","die","caricature"],["Anime","der","anime"],["Manga","der","manga"],["Reise","die","journey"],
+["Urlaub","der","vacation"],["Ausflug","der","excursion"],["Trip","der","trip"],["Tour","die","tour"],
+["Rundreise","die","round trip"],["Reiseführer","der","guidebook"],["Reiseleiter","der","tour guide"],["Tourist","der","tourist"],
+["Passagier","der","passenger"],["Fahrgast","der","passenger"],["Reisende","der","traveler"],["Koffer","der","suitcase"],
+["Rucksack","der","backpack"],["Handgepäck","das","carry-on"],["Gepäck","das","luggage"],["Gepäckwagen","der","luggage cart"],
+["Kofferraum","der","trunk"],["Reisepass","der","passport"],["Visum","das","visa"],["Ausweis","der","ID card"],
+["Fahrkarte","die","ticket"],["Flugticket","das","plane ticket"],["Reservierung","die","reservation"],["Buchung","die","booking"],
+["Stornierung","die","cancellation"],["Verspätung","die","delay"],["Anschluss","der","connection"],["Umsteigen","das","transfer"],
+["Abfahrt","die","departure"],["Ankunft","die","arrival"],["Fahrplan","der","schedule"],["Gleis","das","track"],
+["Bahnsteig","der","platform"],["Wartesaal","der","waiting room"],["Schalter","der","counter"],["Sicherheitskontrolle","die","security check"],
+["Zollkontrolle","die","customs control"],["Deklaration","die","declaration"],["Terminal","das","terminal"],["Gate","das","gate"],
+["Startbahn","die","runway"],["Landebahn","die","runway"],["Pilot","der","pilot"],["Copilot","der","copilot"],
+["Flugbegleiter","der","flight attendant"],["Crew","die","crew"],["Cockpit","das","cockpit"],["Kabine","die","cabin"],
+["Sitz","der","seat"],["Gurt","der","belt"],["Sicherheitsgurt","der","seat belt"],["Notausgang","der","emergency exit"],
+["Schwimmweste","die","life vest"],["Sauerstoffmaske","die","oxygen mask"],["Fallschirm","der","parachute"],["Turbulenz","die","turbulence"],
+["Zwischenlandung","die","stopover"],["Direktflug","der","direct flight"],["Charterflug","der","charter flight"],["Schnellzug","der","express train"],
+["Regionalzug","der","regional train"],["Nachtzug","der","night train"],["S-Bahn","die","suburban train"],["Reisebus","der","coach"],
+["Motorrad","das","motorcycle"],["Roller","der","scooter"],["Moped","das","moped"],["Sportwagen","der","sports car"],
+["Geländewagen","der","SUV"],["Kabrio","das","convertible"],["Kleinwagen","der","compact car"],["Lastwagen","der","truck"],
+["Lieferwagen","der","van"],["Anhänger","der","trailer"],["Segelboot","das","sailboat"],["Motorboot","das","motorboat"],
+["Yacht","die","yacht"],["Fähre","die","ferry"],["Kreuzfahrtschiff","das","cruise ship"],["Frachter","der","freighter"],
+["Matrose","der","sailor"],["Besatzung","die","crew"],["Hafen","der","harbor"],["Anlegestelle","die","pier"],
+["Dock","das","dock"],["Anker","der","anchor"],["Deck","das","deck"],["Kajüte","die","cabin"],
+["Route","die","route"],["Kurs","der","course"],["Navigation","die","navigation"],["Kompass","der","compass"],
+["Atlas","der","atlas"],["Wegbeschreibung","die","directions"],["Abkürzung","die","shortcut"],["Umleitung","die","detour"],
+["Anatomie","die","anatomy"],["Organ","das","organ"],["Gewebe","das","tissue"],["Blutkreislauf","der","circulation"],
+["Arterie","die","artery"],["Vene","die","vein"],["Milz","die","spleen"],["Bauchspeicheldrüse","die","pancreas"],
+["Galle","die","bile"],["Blase","die","bladder"],["Gehirn","das","brain"],["Gelenk","das","joint"],
+["Knorpel","der","cartilage"],["Sehne","die","tendon"],["Diagnose","die","diagnosis"],["Therapie","die","therapy"],
+["Heilung","die","cure"],["Eingriff","der","procedure"],["Narkose","die","anesthesia"],["Infusion","die","infusion"],
+["Medikament","das","medicine"],["Kapsel","die","capsule"],["Pulver","das","powder"],["Tropfen","der","drop"],
+["Salbe","die","ointment"],["Creme","die","cream"],["Gel","das","gel"],["Spray","das","spray"],
+["Verband","der","bandage"],["Pflaster","das","band-aid"],["Gips","der","cast"],["Naht","die","stitch"],
+["Binde","die","bandage"],["Watte","die","cotton"],["Desinfektion","die","disinfection"],["Antibiotikum","das","antibiotic"],
+["Schmerzmittel","das","painkiller"],["Grippeimpfung","die","flu shot"],["Tumor","der","tumor"],["Geschwulst","die","growth"],
+["Entzündung","die","inflammation"],["Pilz","der","fungus"],["Parasit","der","parasite"],["Bluthochdruck","der","hypertension"],
+["Herzinfarkt","der","heart attack"],["Schlaganfall","der","stroke"],["Unfall","der","accident"],["Verstauchung","die","sprain"],
+["Prellung","die","bruise"],["Verbrennung","die","burn"],["Schnitt","der","cut"],["Blutung","die","bleeding"],
+["Klinik","die","clinic"],["Notaufnahme","die","emergency room"],["Intensivstation","die","ICU"],["Station","die","ward"],
+["Ambulanz","die","ambulance"],["Facharzt","der","specialist"],["Hausarzt","der","family doctor"],["Chirurg","der","surgeon"],
+["Anästhesist","der","anesthesiologist"],["Radiologe","der","radiologist"],["Hautarzt","der","dermatologist"],["Frauenarzt","der","gynecologist"],
+["Urologe","der","urologist"],["Psychiater","der","psychiatrist"],["Psychologe","der","psychologist"],["Therapeut","der","therapist"],
+["Hebamme","die","midwife"],["Pfleger","der","caretaker"],["Apotheker","der","pharmacist"],["Krankenkasse","die","health insurance"],
+["Charakter","der","character"],["Persönlichkeit","die","personality"],["Wesen","das","nature"],["Eigenschaft","die","quality"],
+["Tugend","die","virtue"],["Laster","das","vice"],["Mut","der","courage"],["Feigheit","die","cowardice"],
+["Ehrlichkeit","die","honesty"],["Lüge","die","lie"],["Aufrichtigkeit","die","sincerity"],["Zuverlässigkeit","die","reliability"],
+["Vertrauen","das","trust"],["Misstrauen","das","distrust"],["Loyalität","die","loyalty"],["Treue","die","fidelity"],
+["Verrat","der","betrayal"],["Geduld","die","patience"],["Ungeduld","die","impatience"],["Ausdauer","die","persistence"],
+["Fleiß","der","diligence"],["Faulheit","die","laziness"],["Klugheit","die","intelligence"],["Weisheit","die","wisdom"],
+["Dummheit","die","stupidity"],["Neugier","die","curiosity"],["Wissbegier","die","thirst for knowledge"],["Gleichgültigkeit","die","indifference"],
+["Großzügigkeit","die","generosity"],["Geiz","der","stinginess"],["Selbstsucht","die","selfishness"],["Egoismus","der","egoism"],
+["Altruismus","der","altruism"],["Mitgefühl","das","compassion"],["Empathie","die","empathy"],["Sympathie","die","sympathy"],
+["Antipathie","die","antipathy"],["Hass","der","hate"],["Neid","der","envy"],["Eifersucht","die","jealousy"],
+["Stolz","der","pride"],["Demut","die","humility"],["Arroganz","die","arrogance"],["Bescheidenheit","die","modesty"],
+["Eitelkeit","die","vanity"],["Hochmut","der","haughtiness"],["Selbstvertrauen","das","self-confidence"],["Selbstzweifel","der","self-doubt"],
+["Optimismus","der","optimism"],["Pessimismus","der","pessimism"],["Idealismus","der","idealism"],["Fanatismus","der","fanaticism"],
+["Toleranz","die","tolerance"],["Intoleranz","die","intolerance"],["Vorurteil","das","prejudice"],["Diskriminierung","die","discrimination"],
+["Rassismus","der","racism"],["Sexismus","der","sexism"],["Nationalismus","der","nationalism"],["Humor","der","humor"],
+["Witz","der","joke"],["Ironie","die","irony"],["Sarkasmus","der","sarcasm"],["Zynismus","der","cynicism"],
+["Spott","der","mockery"],["Ernst","der","seriousness"],["Leichtsinn","der","recklessness"],["Vorsicht","die","caution"],
+["Furcht","die","dread"],["Schrecken","der","terror"],["Panik","die","panic"],["Sorge","die","worry"],
+["Kummer","der","sorrow"],["Trauer","die","grief"],["Melancholie","die","melancholy"],["Depression","die","depression"],
+["Seligkeit","die","bliss"],["Zufriedenheit","die","contentment"],["Unzufriedenheit","die","dissatisfaction"],["Frustration","die","frustration"],
+["Wut","die","rage"],["Zorn","der","anger"],["Ärger","der","annoyance"],["Empörung","die","indignation"],
+["Aufregung","die","excitement"],["Gelassenheit","die","serenity"],["Nervosität","die","nervousness"],["Anspannung","die","tension"],
+["Entspannung","die","relaxation"],["Sehnsucht","die","longing"],["Nostalgie","die","nostalgia"],["Wehmut","die","melancholy"],
+["Staunen","das","amazement"],["Überraschung","die","surprise"],["Schock","der","shock"],["Verwirrung","die","confusion"],
+["Zweifel","der","doubt"],["Unsicherheit","die","uncertainty"],["Entschlossenheit","die","determination"],["Willenskraft","die","willpower"],
+["Zielstrebigkeit","die","goal orientation"],["Ehrgeiz","der","ambition"],["Trägheit","die","inertia"],["Antrieb","der","drive"],
+["Motivation","die","motivation"],["Inspiration","die","inspiration"],["Kreativität","die","creativity"],["Fantasie","die","imagination"],
+["Vorstellungskraft","die","imagination"],["Intuition","die","intuition"],["Verstand","der","intellect"],["Vernunft","die","reason"],
+["Logik","die","logic"],["Gefühl","das","feeling"],["Emotion","die","emotion"],["Stimmung","die","mood"],
+["Laune","die","mood"],["Affekt","der","affect"],["Leidenschaft","die","passion"],["Deutschland","das","Germany"],
+["Österreich","das","Austria"],["Schweiz","die","Switzerland"],["Frankreich","das","France"],["Italien","das","Italy"],
+["Spanien","das","Spain"],["Portugal","das","Portugal"],["Griechenland","das","Greece"],["Niederlande","die","Netherlands"],
+["Belgien","das","Belgium"],["Luxemburg","das","Luxembourg"],["Dänemark","das","Denmark"],["Schweden","das","Sweden"],
+["Norwegen","das","Norway"],["Finnland","das","Finland"],["Island","das","Iceland"],["Irland","das","Ireland"],
+["Großbritannien","das","Great Britain"],["England","das","England"],["Schottland","das","Scotland"],["Wales","das","Wales"],
+["Polen","das","Poland"],["Tschechien","das","Czechia"],["Slowakei","die","Slovakia"],["Ungarn","das","Hungary"],
+["Rumänien","das","Romania"],["Bulgarien","das","Bulgaria"],["Kroatien","das","Croatia"],["Slowenien","das","Slovenia"],
+["Serbien","das","Serbia"],["Bosnien","das","Bosnia"],["Montenegro","das","Montenegro"],["Albanien","das","Albania"],
+["Mazedonien","das","Macedonia"],["Zypern","das","Cyprus"],["Malta","das","Malta"],["Estland","das","Estonia"],
+["Lettland","das","Latvia"],["Litauen","das","Lithuania"],["Russland","das","Russia"],["Ukraine","die","Ukraine"],
+["Weißrussland","das","Belarus"],["Moldau","die","Moldova"],["Georgien","das","Georgia"],["Armenien","das","Armenia"],
+["Aserbaidschan","das","Azerbaijan"],["Kasachstan","das","Kazakhstan"],["Usbekistan","das","Uzbekistan"],["Turkmenistan","das","Turkmenistan"],
+["Kirgisistan","das","Kyrgyzstan"],["Tadschikistan","das","Tajikistan"],["Mongolei","die","Mongolia"],["China","das","China"],
+["Japan","das","Japan"],["Südkorea","das","South Korea"],["Nordkorea","das","North Korea"],["Indien","das","India"],
+["Pakistan","das","Pakistan"],["Bangladesch","das","Bangladesh"],["Nepal","das","Nepal"],["Sri Lanka","das","Sri Lanka"],
+["Thailand","das","Thailand"],["Vietnam","das","Vietnam"],["Kambodscha","das","Cambodia"],["Laos","das","Laos"],
+["Malaysia","das","Malaysia"],["Singapur","das","Singapore"],["Indonesien","das","Indonesia"],["Philippinen","die","Philippines"],
+["Australien","das","Australia"],["Neuseeland","das","New Zealand"],["USA","die","USA"],["Kanada","das","Canada"],
+["Mexiko","das","Mexico"],["Brasilien","das","Brazil"],["Argentinien","das","Argentina"],["Chile","das","Chile"],
+["Peru","das","Peru"],["Kolumbien","das","Colombia"],["Venezuela","das","Venezuela"],["Bolivien","das","Bolivia"],
+["Ecuador","das","Ecuador"],["Uruguay","das","Uruguay"],["Paraguay","das","Paraguay"],["Kuba","das","Cuba"],
+["Jamaika","das","Jamaica"],["Haiti","das","Haiti"],["Panama","das","Panama"],["Guatemala","das","Guatemala"],
+["Honduras","das","Honduras"],["Ägypten","das","Egypt"],["Marokko","das","Morocco"],["Algerien","das","Algeria"],
+["Tunesien","das","Tunisia"],["Libyen","das","Libya"],["Sudan","der","Sudan"],["Äthiopien","das","Ethiopia"],
+["Kenia","das","Kenya"],["Tansania","das","Tanzania"],["Uganda","das","Uganda"],["Nigeria","das","Nigeria"],
+["Ghana","das","Ghana"],["Senegal","das","Senegal"],["Südafrika","das","South Africa"],["Namibia","das","Namibia"],
+["Botswana","das","Botswana"],["Simbabwe","das","Zimbabwe"],["Mosambik","das","Mozambique"],["Madagaskar","das","Madagascar"],
+["Israel","das","Israel"],["Palästina","das","Palestine"],["Libanon","der","Lebanon"],["Syrien","das","Syria"],
+["Jordanien","das","Jordan"],["Irak","der","Iraq"],["Iran","der","Iran"],["Saudi-Arabien","das","Saudi Arabia"],
+["Katar","das","Qatar"],["Kuwait","das","Kuwait"],["Türkei","die","Turkey"],["Afghanistan","das","Afghanistan"],
+["Deutsche","der","German"],["Österreicher","der","Austrian"],["Schweizer","der","Swiss"],["Franzose","der","Frenchman"],
+["Italiener","der","Italian"],["Spanier","der","Spaniard"],["Portugiese","der","Portuguese"],["Grieche","der","Greek"],
+["Niederländer","der","Dutchman"],["Belgier","der","Belgian"],["Däne","der","Dane"],["Schwede","der","Swede"],
+["Norweger","der","Norwegian"],["Finne","der","Finn"],["Isländer","der","Icelander"],["Ire","der","Irishman"],
+["Brite","der","Briton"],["Engländer","der","Englishman"],["Schotte","der","Scot"],["Pole","der","Pole"],
+["Tscheche","der","Czech"],["Slowake","der","Slovak"],["Ungar","der","Hungarian"],["Rumäne","der","Romanian"],
+["Bulgare","der","Bulgarian"],["Kroate","der","Croat"],["Serbe","der","Serb"],["Russe","der","Russian"],
+["Ukrainer","der","Ukrainian"],["Chinese","der","Chinese"],["Japaner","der","Japanese"],["Koreaner","der","Korean"],
+["Inder","der","Indian"],["Pakistaner","der","Pakistani"],["Vietnamese","der","Vietnamese"],["Thai","der","Thai"],
+["Australier","der","Australian"],["Amerikaner","der","American"],["Kanadier","der","Canadian"],["Mexikaner","der","Mexican"],
+["Brasilianer","der","Brazilian"],["Argentinier","der","Argentine"],["Ägypter","der","Egyptian"],["Marokkaner","der","Moroccan"],
+["Türke","der","Turk"],["Israeli","der","Israeli"],["Jude","der","Jew"],["Araber","der","Arab"],
+["Afrikaner","der","African"]
+];
+
+  // ============ EXTENDED WORD BANK (batch 2) ============
+  var EXTRA_WORDS_2 = [
+["Sekunde","die","second"],["Minute","die","minute"],["Stunde","die","hour"],["Tag","der","day"],
+["Woche","die","week"],["Monat","der","month"],["Jahr","das","year"],["Jahrzehnt","das","decade"],
+["Jahrhundert","das","century"],["Jahrtausend","das","millennium"],["Epoche","die","epoch"],["Ära","die","era"],
+["Periode","die","period"],["Phase","die","phase"],["Abschnitt","der","section"],["Dauer","die","duration"],
+["Zeitraum","der","time span"],["Frist","die","deadline"],["Verabredung","die","date"],["Ewigkeit","die","eternity"],
+["Augenblick","der","moment"],["Null","die","zero"],["Eins","die","one"],["Zwei","die","two"],
+["Drei","die","three"],["Zehn","die","ten"],["Hundert","die","hundred"],["Tausend","die","thousand"],
+["Million","die","million"],["Milliarde","die","billion"],["Billion","die","trillion"],["Hälfte","die","half"],
+["Drittel","das","third"],["Viertel","das","quarter"],["Fünftel","das","fifth"],["Zehntel","das","tenth"],
+["Prozent","das","percent"],["Promille","das","per mille"],["Doppel","das","double"],["Vielfache","das","multiple"],
+["Durchschnitt","der","average"],["Summe","die","sum"],["Differenz","die","difference"],["Produkt","das","product"],
+["Quotient","der","quotient"],["Millimeter","der","millimeter"],["Zentimeter","der","centimeter"],["Meter","der","meter"],
+["Kilometer","der","kilometer"],["Gramm","das","gram"],["Kilogramm","das","kilogram"],["Tonne","die","ton"],
+["Liter","der","liter"],["Milliliter","der","milliliter"],["Hektar","das","hectare"],["Quadratmeter","der","square meter"],
+["Kubikmeter","der","cubic meter"],["Radius","der","radius"],["Winkel","der","angle"],["Fläche","die","area"],
+["Umfang","der","circumference"],["Durchmesser","der","diameter"],["Volumen","das","volume"],["Ziegel","der","brick"],
+["Beton","der","concrete"],["Mörtel","der","mortar"],["Marmor","der","marble"],["Granit","der","granite"],
+["Sandstein","der","sandstone"],["Kalkstein","der","limestone"],["Asphalt","der","asphalt"],["Fliese","die","tile"],
+["Parkett","das","parquet"],["Laminat","das","laminate"],["Putz","der","plaster"],["Isolierung","die","insulation"],
+["Rohr","das","pipe"],["Leitung","die","pipe"],["Wasserhahn","der","tap"],["Wanne","die","tub"],
+["Spülung","die","flush"],["Abfluss","der","drain"],["Heizung","die","heating"],["Klimaanlage","die","air conditioning"],
+["Lüftung","die","ventilation"],["Ofen","der","oven"],["Kessel","der","boiler"],["Schornstein","der","chimney"],
+["Scheibe","die","pane"],["Rollladen","der","shutter"],["Gardine","die","curtain"],["Jalousie","die","blind"],
+["Markise","die","awning"],["Stufe","die","step"],["Geländer","das","railing"],["Rolltreppe","die","escalator"],
+["Rampe","die","ramp"],["Schraubenschlüssel","der","wrench"],["Schraubenzieher","der","screwdriver"],["Zange","die","pliers"],
+["Säge","die","saw"],["Bohrer","der","drill"],["Bohrmaschine","die","power drill"],["Schleifmaschine","die","sander"],
+["Feile","die","file"],["Meißel","der","chisel"],["Axt","die","axe"],["Beil","das","hatchet"],
+["Schere","die","scissors"],["Schraube","die","screw"],["Mutter","die","nut"],["Unterlegscheibe","die","washer"],
+["Nagel","der","nail"],["Bolzen","der","bolt"],["Niet","der","rivet"],["Klebeband","das","tape"],
+["Kleber","der","glue"],["Leim","der","glue"],["Draht","der","wire"],["Kabel","das","cable"],
+["Seil","das","rope"],["Schnur","die","string"],["Kette","die","chain"],["Gummiband","das","rubber band"],
+["Leiter","die","ladder"],["Gerüst","das","scaffold"],["Kran","der","crane"],["Gabelstapler","der","forklift"],
+["Schubkarre","die","wheelbarrow"],["Schaufel","die","shovel"],["Besen","der","broom"],["Wischmopp","der","mop"],
+["Staubsauger","der","vacuum"],["Lappen","der","cloth"],["Schwamm","der","sponge"],["Eimer","der","bucket"],
+["Kiste","die","crate"],["Karton","der","cardboard box"],["Behälter","der","container"],["Flasche","die","bottle"],
+["Glas","das","glass"],["Krug","der","jug"],["Kanne","die","pot"],["Vase","die","vase"],
+["Schüssel","die","bowl"],["Topf","der","pot"],["Pfanne","die","pan"],["Holz","das","wood"],
+["Metall","das","metal"],["Plastik","das","plastic"],["Gummi","das","rubber"],["Leder","das","leather"],
+["Stoff","der","fabric"],["Baumwolle","die","cotton"],["Wolle","die","wool"],["Seide","die","silk"],
+["Leinen","das","linen"],["Samt","der","velvet"],["Satin","der","satin"],["Kristall","der","crystal"],
+["Keramik","die","ceramic"],["Porzellan","das","porcelain"],["Steingut","das","stoneware"],["Ton","der","clay"],
+["Eisen","das","iron"],["Stahl","der","steel"],["Aluminium","das","aluminum"],["Kupfer","das","copper"],
+["Messing","das","brass"],["Bronze","die","bronze"],["Zinn","das","tin"],["Blei","das","lead"],
+["Zink","das","zinc"],["Nickel","das","nickel"],["Chrom","das","chrome"],["Edelstahl","der","stainless steel"],
+["Gold","das","gold"],["Silber","das","silver"],["Platin","das","platinum"],["Titan","das","titanium"],
+["Uran","das","uranium"],["Quecksilber","das","mercury"],["Sperrholz","das","plywood"],["Furnier","das","veneer"],
+["Spanplatte","die","chipboard"],["Kork","der","cork"],["Bambus","der","bamboo"],["Rattan","das","rattan"],
+["Weide","die","willow"],["Lebensmittel","die","groceries"],["Nahrung","die","food"],["Ernährung","die","nutrition"],
+["Kalorie","die","calorie"],["Vitamin","das","vitamin"],["Mineralstoff","der","mineral"],["Protein","das","protein"],
+["Kohlenhydrat","das","carbohydrate"],["Fett","das","fat"],["Ballaststoff","der","fiber"],["Stärke","die","starch"],
+["Aroma","das","flavor"],["Geschmack","der","taste"],["Geruch","der","smell"],["Duft","der","scent"],
+["Rezept","das","recipe"],["Zutat","die","ingredient"],["Portion","die","portion"],["Mahlzeit","die","meal"],
+["Frühstück","das","breakfast"],["Mittagessen","das","lunch"],["Abendessen","das","dinner"],["Snack","der","snack"],
+["Imbiss","der","snack"],["Vorspeise","die","appetizer"],["Hauptgang","der","main course"],["Nachspeise","die","dessert"],
+["Nachtisch","der","dessert"],["Beilage","die","side dish"],["Soße","die","sauce"],["Dressing","das","dressing"],
+["Suppe","die","soup"],["Eintopf","der","stew"],["Salat","der","salad"],["Sandwich","das","sandwich"],
+["Burger","der","burger"],["Pizza","die","pizza"],["Pasta","die","pasta"],["Risotto","das","risotto"],
+["Waffel","die","waffle"],["Pfannkuchen","der","pancake"],["Brötchen","das","roll"],["Baguette","das","baguette"],
+["Croissant","das","croissant"],["Toast","der","toast"],["Vollkornbrot","das","whole wheat bread"],["Roggenbrot","das","rye bread"],
+["Weißbrot","das","white bread"],["Sauerteig","der","sourdough"],["Schmalz","das","lard"],["Olivenöl","das","olive oil"],
+["Sonnenblumenöl","das","sunflower oil"],["Essig","der","vinegar"],["Senf","der","mustard"],["Ketchup","das","ketchup"],
+["Mayonnaise","die","mayonnaise"],["Remoulade","die","remoulade"],["Pesto","das","pesto"],["Quark","der","quark"],
+["Frischkäse","der","cream cheese"],["Schmelzkäse","der","processed cheese"],["Hartkäse","der","hard cheese"],["Kondensmilch","die","condensed milk"],
+["Eigelb","das","yolk"],["Eiweiß","das","egg white"],["Hähnchen","das","chicken"],["Pute","die","turkey"],
+["Lamm","das","lamb"],["Kalb","das","veal"],["Wild","das","game"],["Salami","die","salami"],
+["Kabeljau","der","cod"],["Hummer","der","lobster"],["Muschel","die","mussel"],["Auster","die","oyster"],
+["Tintenfisch","der","squid"],["Süßkartoffel","die","sweet potato"],["Gerste","die","barley"],["Hafer","der","oats"],
+["Hirse","die","millet"],["Quinoa","die","quinoa"],["Grieß","der","semolina"],["Stärkemehl","das","cornstarch"],
+["Honig","der","honey"],["Sirup","der","syrup"],["Konfitüre","die","preserve"],["Gelee","das","jelly"],
+["Erdnussbutter","die","peanut butter"],["Kakao","der","cocoa"],["Lutscher","der","lollipop"],["Kaugummi","der","chewing gum"],
+["Eiscreme","die","ice cream"],["Sorbet","das","sorbet"],["Mode","die","fashion"],["Kostüm","das","costume"],
+["Outfit","das","outfit"],["Garderobe","die","wardrobe"],["Polohemd","das","polo shirt"],["Tanktop","das","tank top"],
+["Hoodie","der","hoodie"],["Sweatshirt","das","sweatshirt"],["Trenchcoat","der","trench coat"],["Parka","der","parka"],
+["Anorak","der","anorak"],["Regenjacke","die","rain jacket"],["Lederjacke","die","leather jacket"],["Caprihose","die","capri pants"],
+["Leggings","die","leggings"],["Jogginghose","die","sweatpants"],["Minirock","der","miniskirt"],["Sommerkleid","das","summer dress"],
+["Abendkleid","das","evening gown"],["Brautkleid","das","wedding dress"],["Overall","der","overall"],["Strampler","der","onesie"],
+["Kniestrümpfe","die","knee socks"],["Turnschuhe","die","sneakers"],["Sandalen","die","sandals"],["Pumps","die","pumps"],
+["Ballerinas","die","ballet flats"],["Gummistiefel","der","rubber boots"],["Wanderschuhe","die","hiking boots"],["Kappe","die","cap"],
+["Zylinder","der","top hat"],["Strohhut","der","straw hat"],["Sonnenhut","der","sun hat"],["Halstuch","das","neckerchief"],
+["Fäustlinge","die","mittens"],["Schleife","die","ribbon"],["Umhängetasche","die","shoulder bag"],["Münzbörse","die","coin purse"],
+["Schmuck","der","jewelry"],["Halskette","die","necklace"],["Ohrringe","die","earrings"],["Brosche","die","brooch"],
+["Kontaktlinsen","die","contact lenses"],["Etui","das","case"],["Möbel","die","furniture"],["Esstisch","der","dining table"],
+["Couchtisch","der","coffee table"],["Beistelltisch","der","side table"],["Hocker","der","stool"],["Barhocker","der","bar stool"],
+["Ottomane","die","ottoman"],["Doppelbett","das","double bed"],["Einzelbett","das","single bed"],["Etagenbett","das","bunk bed"],
+["Kinderbett","das","crib"],["Lattenrost","der","slatted frame"],["Tagesdecke","die","bedspread"],["Sideboard","das","sideboard"],
+["Vitrine","die","display cabinet"],["Truhe","die","chest"],["Tresor","der","safe"],["Wandspiegel","der","wall mirror"],
+["Standspiegel","der","floor mirror"],["Stehlampe","die","floor lamp"],["Tischlampe","die","table lamp"],["Deckenlampe","die","ceiling lamp"],
+["Kronleuchter","der","chandelier"],["Wandleuchte","die","wall light"],["Rollläden","die","shutters"],["Läufer","der","runner"],
+["Fußmatte","die","doormat"],["Wolldecke","die","wool blanket"],["Kunstwerk","das","artwork"],["Poster","das","poster"],
+["Bilderrahmen","der","picture frame"],["Blumentopf","der","flower pot"],["Kerzenhalter","der","candlestick"],["Duftkerze","die","scented candle"],
+["Wanduhr","die","wall clock"],["Standuhr","die","grandfather clock"],["Sanduhr","die","hourglass"],["Sonnenuhr","die","sundial"],
+["Aufbewahrungsbox","die","storage box"],["Wäschekorb","der","laundry basket"],["Papierkorb","der","wastebasket"],["Mülleimer","der","trash can"],
+["Müllsack","der","garbage bag"],["Kehrblech","das","dustpan"],["Wäscheständer","der","drying rack"],["Bügelbrett","das","ironing board"],
+["Ventilator","der","fan"],["Heizkörper","der","radiator"],["Elektroherd","der","electric stove"],["Gasherd","der","gas stove"],
+["Toaster","der","toaster"],["Wasserkocher","der","kettle"],["Kaffeemaschine","die","coffee maker"],["Espressomaschine","die","espresso machine"],
+["Teekanne","die","teapot"],["Mixer","der","blender"],["Küchenmaschine","die","food processor"],["Reiskocher","der","rice cooker"],
+["Gefrierschrank","der","freezer"],["Geschirrspüler","der","dishwasher"],["Spüle","die","sink"],["Dunstabzugshaube","die","range hood"],
+["Trockner","der","dryer"],["Wäschetrockner","der","dryer"],["Bügelmaschine","die","ironing machine"],["Nähmaschine","die","sewing machine"],
+["Werkbank","der","workbench"],["Werkzeugkasten","der","toolbox"],["Werkzeugkiste","die","tool chest"],["Regalbrett","das","shelf board"],
+["Trittleiter","die","step ladder"],["Klappleiter","die","folding ladder"],["Schlüsselbund","der","keychain"],["Ersatzschlüssel","der","spare key"],
+["Türklinke","die","door handle"],["Türgriff","der","door knob"],["Türspion","der","peephole"],["Klingel","die","doorbell"],
+["Gegensprechanlage","die","intercom"],["Alarmanlage","die","alarm system"],["Rauchmelder","der","smoke detector"],["Feuerlöscher","der","fire extinguisher"],
+["Sicherung","die","fuse"],["Sicherungskasten","der","fuse box"],["Steckdose","die","socket"],["Stecker","der","plug"],
+["Verlängerungskabel","das","extension cord"],["Glühbirne","die","light bulb"],["Leuchtstoffröhre","die","fluorescent tube"],["Dimmer","der","dimmer"],
+["Handlung","die","action"],["Tat","die","deed"],["Aktivität","die","activity"],["Verhalten","das","behavior"],
+["Antwort","die","response"],["Bewegungslosigkeit","die","stillness"],["Ruhe","die","rest"],["Anstrengung","die","effort"],
+["Mühe","die","trouble"],["Freizeit","die","leisure"],["Vergnügen","das","pleasure"],["Spaß","der","fun"],
+["Unterhaltung","die","entertainment"],["Amüsement","das","amusement"],["Belustigung","die","amusement"],["Spiel","das","play"],
+["Hobby","das","hobby"],["Interesse","das","interest"],["Wunsch","der","wish"],["Absicht","die","intention"],
+["Vorhaben","das","project"],["Entwurf","der","draft"],["Überlegung","die","consideration"],["Erwägung","die","consideration"],
+["Entscheidung","die","decision"],["Wahl","die","choice"],["Option","die","option"],["Alternative","die","alternative"],
+["Möglichkeit","die","possibility"],["Chance","die","chance"],["Gelegenheit","die","opportunity"],["Zufall","der","coincidence"],
+["Schicksal","das","fate"],["Glück","das","luck"],["Pech","das","bad luck"],["Versagen","das","failure"],
+["Scheitern","das","failure"],["Triumph","der","triumph"],["Errungenschaft","die","achievement"],["Leistung","die","performance"],
+["Folge","die","consequence"],["Konsequenz","die","consequence"],["Auswirkung","die","effect"],["Einfluss","der","influence"],
+["Wirkung","die","effect"],["Veränderung","die","change"],["Wandel","der","change"],["Entwicklung","die","development"],
+["Fortschritt","der","progress"],["Rückschritt","der","setback"],["Verbesserung","die","improvement"],["Verschlechterung","die","worsening"],
+["Niedergang","der","decline"],["Aufstieg","der","rise"],["Fall","der","fall"],["Fortsetzung","die","continuation"],
+["Abschluss","der","conclusion"],["Beginn","der","beginning"],["Ursprung","der","origin"],["Quelle","die","source"],
+["Grund","der","reason"],["Ursache","die","cause"],["Zweck","der","purpose"],["Sinn","der","sense"],
+["Bedeutung","die","meaning"],["Form","die","shape"],["Kreis","der","circle"],["Quadrat","das","square"],
+["Dreieck","das","triangle"],["Rechteck","das","rectangle"],["Oval","das","oval"],["Würfel","der","cube"],
+["Kugel","die","sphere"],["Zylinder","der","cylinder"],["Kegel","der","cone"],["Pyramide","die","pyramid"],
+["Linie","die","line"],["Punkt","der","point"],["Strich","der","stroke"],["Kurve","die","curve"],
+["Gerade","die","straight line"],["Winkel","der","angle"],["Ecke","die","corner"],["Rand","der","edge"],
+["Mitte","die","center"],["Seite","die","side"],["Oberfläche","die","surface"],["Tiefe","die","depth"],
+["Länge","die","length"],["Breite","die","width"],["Höhe","die","height"],["Gewicht","das","weight"],
+["Schild","das","sign"],["Plakat","das","poster"],["Anschlag","der","notice"],["Anzeige","die","display"],
+["Warnung","die","warning"],["Hinweis","der","hint"],["Zeichen","das","signal"],["Symbol","das","symbol"],
+["Pfeil","der","arrow"],["Richtung","die","direction"],["Wegweiser","der","signpost"],["Ampel","die","traffic light"],
+["Stoppschild","das","stop sign"],["Verbot","das","prohibition"],["Gebot","das","command"],["Erlaubnis","die","permission"],
+["Zeitung","die","newspaper"],["Zeitschrift","die","magazine"],["Magazin","das","magazine"],["Journal","das","journal"],
+["Artikel","der","article"],["Schlagzeile","die","headline"],["Bericht","der","report"],["Reportage","die","reportage"],
+["Interview","das","interview"],["Kommentar","der","commentary"],["Kolumne","die","column"],["Redaktion","die","editorial staff"],
+["Redakteur","der","editor"],["Chefredakteur","der","editor-in-chief"],["Reporter","der","reporter"],["Journalist","der","journalist"],
+["Korrespondent","der","correspondent"],["Presse","die","press"],["Medium","das","medium"],["Medien","die","media"],
+["Rundfunk","der","broadcasting"],["Fernsehen","das","television"],["Radio","das","radio"],["Sender","der","broadcaster"],
+["Kanal","der","channel"],["Programm","das","program"],["Sendung","die","broadcast"],["Nachrichten","die","news"],
+["Werbung","die","advertising"],["Annonce","die","classified ad"],["Verlag","der","publisher"],["Buchhandlung","die","bookstore"],
+["Bibliothek","die","library"],["Bücherei","die","library"],["Leser","der","reader"],["Abonnement","das","subscription"],
+["Abo","das","subscription"],["Ausgabe","die","issue"],["Auflage","die","edition"],["Exemplar","das","copy"],
+["Titel","der","title"],["Untertitel","der","subtitle"],["Kapitel","das","chapter"],["Seite","die","page"],
+["Absatz","der","paragraph"],["Zeile","die","line"],["Rand","der","margin"],["Anmerkung","die","annotation"],
+["Fußnote","die","footnote"],["Inhalt","der","content"],["Verzeichnis","das","index"],["Register","das","register"],
+["Vorwort","das","preface"],["Einleitung","die","introduction"],["Fazit","das","conclusion"],["Zusammenfassung","die","summary"],
+["Buch","das","book"],["Roman","der","novel"],["Erzählung","die","story"],["Kurzgeschichte","die","short story"],
+["Novelle","die","novella"],["Gedicht","das","poem"],["Lyrik","die","lyric poetry"],["Prosa","die","prose"],
+["Drama","das","drama"],["Komödie","die","comedy"],["Tragödie","die","tragedy"],["Biografie","die","biography"],
+["Autobiografie","die","autobiography"],["Memoiren","die","memoirs"],["Tagebuch","das","diary"],["Reisebericht","der","travelogue"],
+["Essay","der","essay"],["Aufsatz","der","essay"],["These","die","thesis"],["Hypothese","die","hypothesis"],
+["Doktorarbeit","die","doctoral thesis"],["Wörterbuch","das","dictionary"],["Lexikon","das","lexicon"],["Enzyklopädie","die","encyclopedia"],
+["Handbuch","das","manual"],["Leitfaden","der","guide"],["Anleitung","die","instruction"],["Lehrbuch","das","textbook"],
+["Computer","der","computer"],["Rechner","der","computer"],["Laptop","der","laptop"],["Notebook","das","notebook"],
+["Tablet","das","tablet"],["Smartphone","das","smartphone"],["Handy","das","mobile phone"],["Tastatur","die","keyboard"],
+["Maus","die","mouse"],["Bildschirm","der","screen"],["Monitor","der","monitor"],["Drucker","der","printer"],
+["Scanner","der","scanner"],["Kopierer","der","copier"],["Fax","das","fax"],["Festplatte","die","hard drive"],
+["Speicher","der","memory"],["Prozessor","der","processor"],["Software","die","software"],["Programm","das","program"],
+["Anwendung","die","application"],["App","die","app"],["Datei","die","file"],["Ordner","der","folder"],
+["Verzeichnis","das","directory"],["Laufwerk","das","drive"],["USB-Stick","der","USB stick"],["Festplattengröße","die","storage size"],
+["Netzwerk","das","network"],["Server","der","server"],["Internet","das","internet"],["Browser","der","browser"],
+["Website","die","website"],["Webseite","die","web page"],["Link","der","link"],["Suchmaschine","die","search engine"],
+["E-Mail","die","email"],["Anhang","der","attachment"],["Nachricht","die","message"],["Chat","der","chat"],
+["Passwort","das","password"],["Benutzername","der","username"],["Anmeldung","die","login"],["Konto","das","account"],
+["Virus","das","virus"],["Firewall","die","firewall"],["Hacker","der","hacker"],["Update","das","update"],
+["Installation","die","installation"],["Download","der","download"],["Upload","der","upload"],["Speicherung","die","storage"],
+["Datenbank","die","database"],["Cloud","die","cloud"],["Backup","das","backup"],["Werkzeug","das","tool"],
+["Hammer","der","hammer"],["Schraubenschlüssel","der","wrench"],["Säge","die","saw"],["Bohrmaschine","die","drill"],
+["Zange","die","pliers"],["Feile","die","file"],["Meißel","der","chisel"],["Axt","die","axe"],
+["Beil","das","hatchet"],["Messer","das","knife"],["Schere","die","scissors"],["Zollstock","der","folding rule"],
+["Maßband","das","tape measure"],["Wasserwaage","die","spirit level"],["Lupe","die","magnifying glass"],["Mikroskop","das","microscope"],
+["Teleskop","das","telescope"],["Fernrohr","das","telescope"],["Kompass","der","compass"],["Landkarte","die","map"],
+["Atlas","der","atlas"],["Globus","der","globe"],["Erdkugel","die","globe"],["Uhr","die","clock"],
+["Stoppuhr","die","stopwatch"],["Thermometer","das","thermometer"],["Barometer","das","barometer"],["Waage","die","scale"],
+["Geburt","die","birth"],["Taufe","die","baptism"],["Erstkommunion","die","first communion"],["Konfirmation","die","confirmation"],
+["Jugendweihe","die","youth consecration"],["Verlobung","die","engagement"],["Hochzeit","die","wedding"],["Scheidung","die","divorce"],
+["Tod","der","death"],["Beerdigung","die","funeral"],["Begräbnis","das","burial"],["Trauerfeier","die","memorial service"],
+["Grab","das","grave"],["Grabstein","der","gravestone"],["Friedhof","der","cemetery"],["Sarg","der","coffin"],
+["Urne","die","urn"],["Krematorium","das","crematorium"],["Nachruf","der","obituary"],["Testament","das","will"],
+["Erbschaft","die","inheritance"],["Witwe","die","widow"],["Witwer","der","widower"],["Waise","die","orphan"],
+["Polizei","die","police"],["Polizist","der","policeman"],["Wache","die","police station"],["Streifenwagen","der","patrol car"],
+["Sirene","die","siren"],["Handschellen","die","handcuffs"],["Waffe","die","weapon"],["Pistole","die","pistol"],
+["Revolver","der","revolver"],["Gewehr","das","rifle"],["Schlagstock","der","baton"],["Schutzschild","der","riot shield"],
+["Einsatz","der","operation"],["Streife","die","patrol"],["Razzia","die","raid"],["Verhaftung","die","arrest"],
+["Festnahme","die","arrest"],["Vorführung","der","presentation"],["Vernehmung","die","interrogation"],["Geständnis","das","confession"],
+["Ermittlung","die","investigation"],["Spurensicherung","die","forensics"],["Fingerabdruck","der","fingerprint"],["DNA-Analyse","die","DNA analysis"],
+["Beweismittel","das","evidence"],["Tatort","der","crime scene"],["Zeugenaussage","die","witness statement"],["Alibi","das","alibi"],
+["Mord","der","murder"],["Totschlag","der","manslaughter"],["Selbstmord","der","suicide"],["Unfall","der","accident"],
+["Notruf","der","emergency call"],["Notarzt","der","emergency doctor"],["Krankenwagen","der","ambulance"],["Feuerwehr","die","fire department"],
+["Feuerwehrmann","der","firefighter"],["Löschfahrzeug","das","fire truck"],["Leiter","die","ladder"],["Schlauch","der","hose"],
+["Hydrant","der","hydrant"],["Löscher","der","extinguisher"],["Rauch","der","smoke"],["Flamme","die","flame"],
+["Brand","der","fire"],["Explosion","die","explosion"],["Rettung","die","rescue"],["Rettungswagen","der","ambulance"],
+["Katastrophe","die","catastrophe"],["Naturkatastrophe","die","natural disaster"],["Erdbeben","das","earthquake"],["Überschwemmung","die","flood"],
+["Dürre","die","drought"],["Hurrikan","der","hurricane"],["Tornado","der","tornado"],["Vulkanausbruch","der","volcanic eruption"],
+["Lawine","die","avalanche"],["Erdrutsch","der","landslide"],["Tsunami","der","tsunami"]
+];
+
+  // Merge all word banks
+  var ALL_WORDS = [];
+  DATA.words = ALL_WORDS.concat(EXTRA_WORDS).concat(EXTRA_WORDS_2);
+  var TOTAL_ITEMS = DATA.words.length + DATA.verbs.length + DATA.adjectives.length + DATA.adverbs.length;
+
+  // ============ CONFIG ============
+  var CONFIG = {TIME_LIMIT: 20000, PLAN_DAYS: 120};
+
+  // ============ UTILITY ============
+  function shuffle(a){ for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;} return a; }
+  function pick(arr,n){ return shuffle(arr.slice()).slice(0,n); }
+  function norm(s){ return (s||'').toLowerCase().trim().replace(/ß/g,'ss').replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/[.?!,;:"]/g,'').replace(/\s+/g,' '); }
+  var ARTICLE_RE = /^(der|die|das|den|dem|des|ein|eine|einen|einem|einer|eines)\s+/;
+  function matches(answer, expected){
+    var a = norm(answer), e = norm(expected);
+    if(a === e) return true;
+    if(!ARTICLE_RE.test(e)){ if(a.replace(ARTICLE_RE,'') === e) return true; }
+    return false;
   }
+  function todayStr(){ var d=new Date(); return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
+  function datePlus(days){ var d=new Date(); d.setDate(d.getDate()+days); return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
+  function daysBetween(a,b){ return Math.floor((new Date(b)-new Date(a))/86400000); }
+
+  // ============ QUESTION BUILDERS ============
+  function bildQ(){
+    var chosen = pick(DATA.cards,4); var t = chosen[0];
+    return { type:'mc', img:t.url, prompt:'', sub:'Bildkarte · what is this?', law:'Input',
+      options: shuffle(chosen.map(function(c){return c.a+' '+c.w;})), correct: t.a+' '+t.w,
+      speakText: t.a+' '+t.w, explain: t.a+' '+t.w+' = the '+t.en, recap:{q:t.en, correct:t.a+' '+t.w} };
+  }
+  function abrufQ(){
+    var r = Math.random();
+    if(r<0.35){
+      var it = DATA.words[Math.floor(Math.random()*DATA.words.length)];
+      return { type:'type', prompt: it[2], sub:'Gesetz 1 · retrieve from memory ('+it[1]+')', law:'Gesetz 1', options:[],
+        correct: it[0], speakText: it[1]+' '+it[0], explain: it[1]+' '+it[0]+' = the '+it[2], recap:{q:it[2], correct:it[1]+' '+it[0]} };
+    } else if(r<0.6){
+      var a = DATA.adjectives[Math.floor(Math.random()*DATA.adjectives.length)];
+      return { type:'type', prompt: a[1], sub:'Adjektiv · translate', law:'Adjektiv', options:[],
+        correct: a[0], speakText: a[0], explain: a[0]+' = '+a[1], recap:{q:a[1], correct:a[0]} };
+    } else if(r<0.8){
+      var v = DATA.verbs[Math.floor(Math.random()*DATA.verbs.length)];
+      return { type:'type', prompt: v[1], sub:'Verb · translate', law:'Verb', options:[],
+        correct: v[0], speakText: v[0], explain: v[0]+' = '+v[1], recap:{q:v[1], correct:v[0]} };
+    } else {
+      var st = DATA.sentences[Math.floor(Math.random()*DATA.sentences.length)];
+      return { type:'type', prompt: st[0], sub:'Gesetz 1 · translate the sentence', law:'Gesetz 1', options:[],
+        correct: st[1], speakText: st[1], explain: st[1], recap:{q:st[0], correct:st[1]} };
+    }
+  }
+  function vocabMC(){
+    var chosen = pick(DATA.words,4); var t = chosen[0];
+    return { type:'mc', prompt: t[2], sub:'Vocabulary · high-frequency word', law:'Häufigkeit', options: shuffle(chosen.map(function(c){return c[0];})),
+      correct: t[0], speakText: t[1]+' '+t[0], explain: t[1]+' '+t[0]+' = the '+t[2], recap:{q:t[2], correct:t[1]+' '+t[0]} };
+  }
+  function adjMC(){
+    var chosen = pick(DATA.adjectives,4); var t = chosen[0];
+    return { type:'mc', prompt: t[1], sub:'Adjektiv · which one?', law:'Adjektiv', options: shuffle(chosen.map(function(c){return c[0];})),
+      correct: t[0], speakText: t[0], explain: t[0]+' = '+t[1], recap:{q:t[1], correct:t[0]} };
+  }
+  function verbQ(){
+    var r = Math.random();
+    if(r<0.5){
+      var chosen = pick(DATA.verbs,4); var t = chosen[0];
+      return { type:'mc', prompt: t[1], sub:'Verben · which verb?', law:'Verben', options: shuffle(chosen.map(function(c){return c[0];})),
+        correct: t[0], speakText: t[0], explain: t[0]+' = '+t[1], recap:{q:t[1], correct:t[0]} };
+    }
+    var v = DATA.verbs[Math.floor(Math.random()*DATA.verbs.length)];
+    return { type:'type', prompt: v[1], sub:'Verben · translate', law:'Verben', options:[],
+      correct: v[0], speakText: v[0], explain: v[0]+' = '+v[1], recap:{q:v[1], correct:v[0]} };
+  }
+  function grammarMC(){
+    var g = DATA.grammar[Math.floor(Math.random()*DATA.grammar.length)];
+    return { type:'mc', prompt: g[0], sub:'Grammar · sentence pattern', law:'Gesetz 4', feynman:true, concept:g[5], options: shuffle(g[1].slice()),
+      correct: g[2], speakText: g[4], explain: g[3], recap:{q:g[0], correct:g[2]+' — '+g[3]} };
+  }
+  function numberMC(){
+    var n = 1+Math.floor(Math.random()*99);
+    var ones=['','eins','zwei','drei','vier','fünf','sechs','sieben','acht','neun'];
+    var teens=['zehn','elf','zwölf','dreizehn','vierzehn','fünfzehn','sechzehn','siebzehn','achtzehn','neunzehn'];
+    var tens=['','','zwanzig','dreißig','vierzig','fünfzig','sechzig','siebzig','achtzig','neunzig'];
+    function w(x){ if(x<10)return ones[x]; if(x<20)return teens[x-10]; var tt=Math.floor(x/10),o=x%10; if(o===0)return tens[tt]; return (o===1?'ein':ones[o])+'und'+tens[tt]; }
+    var correct=w(n), dist=[], guard=0;
+    while(dist.length<3 && guard++<50){ var m=1+Math.floor(Math.random()*99); var ww=w(m); if(m!==n && dist.indexOf(ww)<0) dist.push(ww); }
+    return { type:'mc', prompt: String(n), sub:'Number · spell it', law:'Chunks', options: shuffle([correct].concat(dist)),
+      correct: correct, speakText: correct, explain: n+' = '+correct, recap:{q:String(n), correct:correct} };
+  }
+  function listenQ(){
+    var r = Math.random();
+    if(r<0.4){
+      var chosen = pick(DATA.words,4); var t = chosen[0];
+      return { type:'mc', isListen:true, prompt:'', sub:'Hören · what did you hear?', law:'Input',
+        options: shuffle(chosen.map(function(c){return c[2];})), correct: t[2],
+        speakText: t[1]+' '+t[0], explain: t[1]+' '+t[0]+' = the '+t[2], recap:{q:t[2], correct:t[1]+' '+t[0]} };
+    }
+    var cs = pick(DATA.sentences,4); var ts = cs[0];
+    return { type:'mc', isListen:true, prompt:'', sub:'Hören · which sentence?', law:'Input',
+      options: shuffle(cs.map(function(c){return c[0];})), correct: ts[0],
+      speakText: ts[1], explain: ts[1]+' = '+ts[0], recap:{q:ts[0], correct:ts[1]} };
+  }
+  function compoundQ(){
+    var c = DATA.compounds[Math.floor(Math.random()*DATA.compounds.length)];
+    return { type:'mc', prompt: c[0], sub:'Gesetz 5 · '+c[1]+' + '+c[2]+' = ?', law:'Gesetz 5', options: shuffle([c[3]].concat(c[4])),
+      correct: c[3], speakText: c[0], explain: c[0]+' ('+c[1]+' + '+c[2]+') = '+c[3], recap:{q:c[0], correct:c[0]+' = '+c[3]} };
+  }
+  function mixedQ(){ var b=[vocabMC, grammarMC, numberMC, listenQ, adjMC, verbQ]; return b[Math.floor(Math.random()*b.length)](); }
+
+  // ============ SM-2 ============
+  function gradeCard(key, answer, quality){
+    var c = S.cards[key] || {a:answer, ef:2.5, rep:0, iv:0, due:todayStr()};
+    if(quality < 3){ c.rep = 0; c.iv = 1; }
+    else {
+      c.rep++;
+      if(c.rep===1) c.iv = 1;
+      else if(c.rep===2) c.iv = 6;
+      else c.iv = Math.max(1, Math.round(c.iv * c.ef));
+      c.ef = Math.max(1.3, c.ef + (0.1 - (5-quality)*(0.08 + (5-quality)*0.02)));
+    }
+    c.a = answer; c.due = datePlus(c.iv);
+    S.cards[key] = c; save();
+    return c.iv;
+  }
+  function dueCards(){
+    var t = todayStr(), out=[];
+    for(var k in S.cards){ if(S.cards[k].due <= t) out.push({key:k, a:S.cards[k].a}); }
+    return out;
+  }
+  function reviewQ(){
+    var due = dueCards();
+    if(due.length){
+      var d = due[Math.floor(Math.random()*due.length)];
+      return { type:'type', prompt: d.key, sub:'Gesetz 2 · SM-2 spaced review', law:'Gesetz 2', cardKey:d.key, options:[],
+        correct: d.a.replace(/^(der|die|das)\s+/,''), speakText: d.a, explain: d.a, recap:{q:d.key, correct:d.a} };
+    }
+    return vocabMC();
+  }
+
+  // ============ MISSIONS ============
+  var MISSIONS = {
+    bild:      {name:'Bildkarten',   en:'Image cards',    law:'Input',        icon:'B', color:'var(--teal)',   soft:'var(--teal-soft)',   count:6, base:12, build:bildQ},
+    abruf:     {name:'Abruf',        en:'Active recall',  law:'Gesetz 1',     icon:'A', color:'var(--pink)',   soft:'var(--pink-soft)',   count:8, base:15, build:abrufQ},
+    misch:     {name:'Misch-Training',en:'Interleaving',  law:'Gesetz 3',     icon:'M', color:'var(--blue)',   soft:'var(--blue-soft)',   count:8, base:12, build:mixedQ},
+    verben:    {name:'Verben',       en:'Verbs',          law:'Verben',       icon:'V', color:'var(--purple)', soft:'var(--purple-soft)', count:8, base:14, build:verbQ},
+    komposita: {name:'Komposita',    en:'Word chunks',    law:'Gesetz 5',     icon:'K', color:'var(--accent2)',soft:'var(--accent2-soft)',count:6, base:12, build:compoundQ},
+    hoeren:    {name:'Hören',        en:'Listening',      law:'Input',        icon:'H', color:'var(--accent)', soft:'var(--accent-soft)', count:6, base:12, build:listenQ},
+    review:    {name:'Wiederholung', en:'SM-2 review',    law:'Gesetz 2',     icon:'R', color:'var(--slate)',  soft:'var(--slate-soft)',  count:8, base:12, build:reviewQ}
+  };
+  var MISSION_ORDER = ['bild','abruf','misch','verben','komposita','hoeren','review'];
+  var N_MISSIONS = 7;
+  var LAWS = [['1','Abruf'],['2','Intervall'],['3','Mischung'],['4','Erklären'],['5','Chunks']];
+
+  // ============ AUDIO ============
+  var actx=null;
+  function tone(freq,start,dur,type,vol){ try{ if(!actx) actx=new (window.AudioContext||window.webkitAudioContext)(); var o=actx.createOscillator(),g=actx.createGain(); o.type=type||'sine'; o.frequency.value=freq; g.gain.setValueAtTime(0.0001,actx.currentTime+start); g.gain.exponentialRampToValueAtTime(vol||0.14,actx.currentTime+start+0.02); g.gain.exponentialRampToValueAtTime(0.0001,actx.currentTime+start+dur); o.connect(g); g.connect(actx.destination); o.start(actx.currentTime+start); o.stop(actx.currentTime+start+dur+0.05); }catch(e){} }
+  function sndCorrect(){ tone(523,0,.12,'sine',.13); tone(659,.1,.12,'sine',.13); tone(784,.2,.18,'sine',.13); }
+  function sndWrong(){ tone(160,0,.25,'sawtooth',.09); tone(120,.08,.3,'sawtooth',.07); }
+  function sndFinish(){ [523,659,784,1047].forEach(function(f,i){ tone(f,i*0.12,.22,'triangle',.12); }); }
+  var deVoice=null;
+  function loadVoices(){ try{ var vs=speechSynthesis.getVoices(); for(var i=0;i<vs.length;i++){ if(vs[i].lang&&vs[i].lang.toLowerCase().indexOf('de')===0){ deVoice=vs[i]; break; } } }catch(e){} }
+  if('speechSynthesis' in window){ loadVoices(); try{ speechSynthesis.onvoiceschanged=loadVoices; }catch(e){} }
+  function speak(t){ try{ if(!('speechSynthesis' in window)) return; var u=new SpeechSynthesisUtterance(t); u.lang='de-DE'; u.rate=0.85; if(deVoice) u.voice=deVoice; speechSynthesis.cancel(); speechSynthesis.speak(u); }catch(e){} }
+  function spkSVG(sz,c){ return '<svg width="'+(sz||18)+'" height="'+(sz||18)+'" viewBox="0 0 24 24" fill="none" stroke="'+(c||'var(--accent)')+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>'; }
+
+  // ============ STATE ============
+  var SK='deutsch_plan_v8';
+  var S = {start:null, xp:0, streak:0, lastDay:null, done:{}, stars:{}, cards:{}, stats:{}, total:{c:0,t:0}};
+  function load(){ try{ var raw=localStorage.getItem(SK); if(raw){ var p=JSON.parse(raw); for(var k in p) S[k]=p[k]; } }catch(e){} if(!S.start){ S.start=new Date().toISOString().slice(0,10); save(); } }
+  function save(){ try{ localStorage.setItem(SK, JSON.stringify(S)); }catch(e){} }
+  function rank(xp){ if(xp>=6000) return ['B2 Ready','#ba3b5b']; if(xp>=4000) return ['B1+','#2d6b8a']; if(xp>=2500) return ['B1','#2d6b8a']; if(xp>=1500) return ['A2+','var(--accent2)']; if(xp>=700) return ['A2','var(--accent2)']; if(xp>=250) return ['A1+','var(--accent)']; return ['A1','var(--accent)']; }
+  load();
+
+  var cur = { key:null, idx:0, correct:0, xpEarned:0, answered:false, qStart:0, mistakes:[] };
+  var timerId=null, q=null;
+  var app=document.getElementById('app');
+  function clearTimer(){ if(timerId){ clearInterval(timerId); timerId=null; } }
+  function flameSVG(){ return '<svg width="16" height="16" viewBox="0 0 24 24" fill="var(--accent2)" stroke="var(--accent2)" stroke-width="1.5"><path d="M12 2s4 4 4 8a4 4 0 0 1-8 0c0-1.5.5-2.5 1-3.5C10 9 12 8 12 2z"/></svg>'; }
+  function starSVG(c){ return '<svg width="16" height="16" viewBox="0 0 24 24" fill="'+(c||'var(--accent2)')+'" stroke="'+(c||'var(--accent2)')+'" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>'; }
+  function checkSVG(){ return '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>'; }
+
+  // ============ DASHBOARD ============
+  function renderDashboard(){
+    clearTimer();
+    var today=todayStr();
+    var doneToday = S.done[today] || {};
+    var doneCount = MISSION_ORDER.filter(function(k){ return doneToday[k]; }).length;
+    var allDone = doneCount===N_MISSIONS;
+    var elapsed = Math.min(CONFIG.PLAN_DAYS, Math.max(0, daysBetween(S.start, today)));
+    var remain = CONFIG.PLAN_DAYS - elapsed;
+    var target = new Date(new Date(S.start).getTime() + CONFIG.PLAN_DAYS*86400000);
+    var targetStr = target.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    var rk = rank(S.xp);
+    var journeyPct = Math.min(100, (elapsed/CONFIG.PLAN_DAYS)*100);
+    var stage = elapsed<30?'A1 → A2':elapsed<60?'A2 → B1':elapsed<90?'B1 consolidation':'B1 → B2';
+    var dueCount = dueCards().length;
+    var cardCount = Object.keys(S.cards).length;
+
+    var lawChips = LAWS.map(function(l){
+      return '<span style="display:inline-flex;align-items:center;gap:4px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:4px 8px;font-size:11px;color:var(--muted);"><strong style="color:var(--accent);">'+l[0]+'</strong>'+l[1]+'</span>';
+    }).join('');
+
+    var missionCards = MISSION_ORDER.map(function(k){
+      var m=MISSIONS[k]; var done=!!doneToday[k]; var stars=S.stars[today+'_'+k]||0;
+      var starsHTML=''; for(var i=0;i<3;i++){ starsHTML+='<span class="star'+(i<stars?' earned':'')+'" style="opacity:'+(i<stars?1:0.2)+';">'+starSVG(i<stars?'var(--accent2)':'#cbd5e1')+'</span>'; }
+      var badge = (k==='review' && dueCount) ? (' · '+dueCount+' due') : '';
+      return '<div class="mission-card fadeUp" data-m="'+k+'" style="background:var(--card);border:1px solid '+(done?m.color:'var(--border)')+';border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 1px 3px rgba(0,0,0,.05);'+(done?'opacity:.85;':'')+'">'
+        +'<div style="width:44px;height:44px;border-radius:12px;background:'+m.soft+';color:'+m.color+';display:flex;align-items:center;justify-content:center;font-weight:700;font-size:19px;flex-shrink:0;">'+(done?'<div style="width:26px;height:26px;border-radius:50%;background:'+m.color+';display:flex;align-items:center;justify-content:center;">'+checkSVG()+'</div>':m.icon)+'</div>'
+        +'<div style="flex:1;min-width:0;">'
+        +'<div style="font-weight:600;font-size:15.5px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">'+m.name+' <span class="law-chip" style="background:'+m.soft+';color:'+m.color+';">'+m.law+'</span></div>'
+        +'<div style="color:var(--muted);font-size:12px;margin-top:2px;">'+m.en+badge+'</div>'
+        +'<div style="display:flex;gap:3px;margin-top:4px;">'+starsHTML+'</div></div>'
+        +'<div style="text-align:right;flex-shrink:0;"><div style="font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600;">'+(done?'done':'+'+m.count*m.base)+'</div><div style="font-size:10px;color:var(--muted);">'+(done?'':'XP')+'</div></div></div>';
+    }).join('');
+
+    app.innerHTML =
+      '<div class="fadeUp" style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px;flex-wrap:wrap;">'
+      +'<div><div style="font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);font-weight:600;">5 Gesetze · SM-2 · 120 Tage</div>'
+      +'<h1 style="font-size:22px;font-weight:700;margin:2px 0 0;line-height:1.2;">A1 <span style="color:var(--muted);font-weight:400;">→</span> B2 Plan</h1></div>'
+      +'<div style="display:flex;gap:8px;">'
+      +'<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:5px 11px;text-align:center;"><div style="font-size:15px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;">'+S.xp+'</div><div style="font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);">XP</div></div>'
+      +'<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:5px 11px;text-align:center;display:flex;align-items:center;gap:5px;"><div>'+flameSVG()+'</div><div><div style="font-size:15px;font-weight:700;color:var(--accent2);font-variant-numeric:tabular-nums;line-height:1;">'+S.streak+'</div><div style="font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);">streak</div></div></div>'
+      +'</div></div>'
+
+      +'<div class="fadeUp" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;">'+lawChips
+      +'<span style="display:inline-flex;align-items:center;gap:4px;background:var(--purple-soft);border:1px solid var(--purple);border-radius:10px;padding:4px 8px;font-size:11px;color:var(--purple);font-weight:600;">'+TOTAL_ITEMS+' items</span>'
+      +'<span style="display:inline-flex;align-items:center;gap:4px;background:var(--accent2-soft);border:1px solid var(--accent2);border-radius:10px;padding:4px 8px;font-size:11px;color:var(--accent2);font-weight:600;">'+cardCount+' cards</span></div>'
+
+      +'<div class="fadeUp" style="background:var(--card);border:1px solid var(--border);border-radius:18px;padding:16px;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,.04);">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:6px;">'
+      +'<span style="background:var(--accent-soft);color:'+rk[1]+';padding:3px 11px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border:1px solid '+rk[1]+';">'+rk[0]+'</span>'
+      +'<span style="font-size:11.5px;color:var(--muted);">Day '+elapsed+'/'+CONFIG.PLAN_DAYS+' · '+remain+' left · B2 by '+targetStr+'</span></div>'
+      +'<div style="position:relative;height:9px;background:rgba(128,128,128,.1);border-radius:8px;margin:12px 0 6px;">'
+      +'<div style="height:100%;width:'+journeyPct+'%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:8px;transition:width .6s ease;"></div>'
+      +'<div style="position:absolute;top:50%;left:'+Math.min(97,journeyPct)+'%;transform:translate(-50%,-50%);width:16px;height:16px;border-radius:50%;background:#fff;border:3px solid var(--accent2);"></div></div>'
+      +'<div style="display:flex;justify-content:space-between;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600;"><span>A1</span><span>A2</span><span>B1</span><span>B2</span></div>'
+      +'<div style="text-align:center;margin-top:8px;font-size:12px;color:var(--muted);">Phase: <strong style="color:var(--text);">'+stage+'</strong></div></div>'
+
+      +'<div class="fadeUp" style="margin-bottom:12px;">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;"><span style="font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600;">Today · '+doneCount+'/'+N_MISSIONS+' missions</span>'
+      +(allDone?'<span class="newbest" style="background:var(--accent2-soft);color:var(--accent2);border:1px solid var(--accent2);padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;">Complete!</span>':'')+'</div>'
+      +'<div style="height:8px;background:rgba(128,128,128,.1);border-radius:6px;overflow:hidden;"><div style="height:100%;width:'+(doneCount*(100/N_MISSIONS))+'%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:6px;transition:width .5s ease;"></div></div></div>'
+
+      + missionCards
+
+      +'<div style="display:flex;gap:10px;margin-top:14px;">'
+      +'<button id="statsBtn" style="flex:1;padding:12px;border-radius:12px;background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;">Statistik</button>'
+      +'<button id="resetBtn" style="flex:1;padding:12px;border-radius:12px;background:transparent;color:var(--muted);border:1px solid var(--border);font-family:inherit;font-size:12px;cursor:pointer;">Reset all</button></div>'
+      +'<p style="text-align:center;color:var(--muted);font-size:11px;margin-top:14px;line-height:1.6;">'+DATA.words.length+' nouns · '+DATA.verbs.length+' verbs · '+DATA.adjectives.length+' adjectives · '+DATA.adverbs.length+' adverbs</p>';
+
+    app.querySelectorAll('.mission-card').forEach(function(el){ el.addEventListener('click', function(){ startMission(el.getAttribute('data-m')); }); });
+    document.getElementById('statsBtn').addEventListener('click', renderStats);
+    document.getElementById('resetBtn').addEventListener('click', function(){ if(confirm('Reset ALL progress?')){ S={start:new Date().toISOString().slice(0,10),xp:0,streak:0,lastDay:null,done:{},stars:{},cards:{},stats:{},total:{c:0,t:0}}; save(); renderDashboard(); } });
+  }
+
+  function renderStats(){
+    clearTimer();
+    var concepts = [];
+    for(var c in S.stats){ var st=S.stats[c]; if(st.t>0) concepts.push({name:c, acc:Math.round(st.c/st.t*100), t:st.t, c:st.c}); }
+    concepts.sort(function(a,b){ return a.acc-b.acc; });
+    var overall = S.total.t>0 ? Math.round(S.total.c/S.total.t*100) : 0;
+    var cardCount = Object.keys(S.cards).length;
+    var dueCount = dueCards().length;
+
+    var bars = concepts.length ? concepts.map(function(c){
+      var col = c.acc>=80 ? 'var(--good)' : c.acc>=60 ? 'var(--accent2)' : 'var(--bad)';
+      return '<div style="margin-bottom:12px;"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;"><span style="font-weight:600;">'+c.name+'</span><span style="font-weight:700;color:'+col+';font-variant-numeric:tabular-nums;">'+c.acc+'% <span style="color:var(--muted);font-weight:400;font-size:11px;">('+c.c+'/'+c.t+')</span></span></div>'
+        +'<div class="stat-bar"><div class="stat-fill" style="width:'+c.acc+'%;background:'+col+';"></div></div></div>';
+    }).join('') : '<div style="color:var(--muted);font-size:13px;text-align:center;padding:16px 0;">Do the Misch-Training mission to build stats.</div>';
+
+    var weakest = concepts.length ? concepts[0] : null;
+
+    app.innerHTML =
+      '<div class="fadeUp" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">'
+      +'<button id="backBtn" style="background:transparent;border:none;color:var(--muted);font-family:inherit;font-size:13px;cursor:pointer;padding:4px 0;">← Dashboard</button>'
+      +'<h2 style="font-size:18px;font-weight:700;margin:0;">Statistik</h2><div style="width:60px;"></div></div>'
+
+      +'<div class="fadeUp" style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;">'
+      +'<div style="flex:1 1 80px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px;text-align:center;"><div style="font-size:22px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;">'+overall+'%</div><div style="font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);">Overall</div></div>'
+      +'<div style="flex:1 1 80px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px;text-align:center;"><div style="font-size:22px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;">'+S.total.t+'</div><div style="font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);">Answered</div></div>'
+      +'<div style="flex:1 1 80px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px;text-align:center;"><div style="font-size:22px;font-weight:700;color:var(--blue);font-variant-numeric:tabular-nums;">'+cardCount+'</div><div style="font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);">SM-2 cards</div></div>'
+      +'<div style="flex:1 1 80px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px;text-align:center;"><div style="font-size:22px;font-weight:700;color:var(--accent2);font-variant-numeric:tabular-nums;">'+dueCount+'</div><div style="font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);">Due today</div></div></div>'
+
+      +(weakest ? '<div class="fadeUp" style="background:var(--bad-soft);border:1px solid var(--bad);border-radius:14px;padding:12px 14px;margin-bottom:18px;font-size:13px;color:var(--bad);"><strong>Focus tip:</strong> '+weakest.name+' is your weakest area ('+weakest.acc+'%). Drill it in Misch-Training.</div>' : '')
+
+      +'<div class="fadeUp" style="background:var(--card);border:1px solid var(--border);border-radius:18px;padding:18px;box-shadow:0 2px 8px rgba(0,0,0,.04);">'
+      +'<div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:14px;">Accuracy by category</div>'
+      + bars + '</div>';
+
+    document.getElementById('backBtn').addEventListener('click', renderDashboard);
+  }
+
+  function startMission(key){ cur={key:key, idx:0, correct:0, xpEarned:0, answered:false, qStart:0, mistakes:[]}; renderQ(); }
+
+  function renderQ(){
+    clearTimer();
+    cur.answered=false;
+    var m=MISSIONS[cur.key];
+    q=m.build();
+    cur.qStart=Date.now();
+    var pct=(cur.idx/m.count)*100;
+
+    var promptBlock;
+    if(q.img){
+      promptBlock = '<img src="'+q.img+'" alt="card" onerror="this.style.display=\'none\'" style="width:100%;max-height:190px;object-fit:contain;border-radius:12px;margin-bottom:6px;background:var(--bg);"/>';
+    } else if(q.isListen){
+      promptBlock = '<button class="speak-btn" id="playListen" style="width:64px;height:64px;border-radius:50%;background:var(--teal-soft);border:2px solid var(--teal);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;margin-bottom:6px;">'+spkSVG(26,'var(--teal)')+'</button>'
+        +'<div style="font-size:12px;color:var(--muted);margin-bottom:6px;">Tap to replay</div>'
+        +'<div style="height:18px;"><span class="wave-bar" style="height:12px;"></span><span class="wave-bar" style="height:16px;animation-delay:.15s;"></span><span class="wave-bar" style="height:10px;animation-delay:.3s;"></span><span class="wave-bar" style="height:16px;animation-delay:.45s;"></span><span class="wave-bar" style="height:12px;animation-delay:.6s;"></span></div>';
+    } else {
+      promptBlock = '<div style="font-size:26px;font-weight:700;line-height:1.25;margin-bottom:4px;word-break:break-word;">'+q.prompt+'</div>';
+    }
+
+    var answerArea;
+    if(q.type==='mc'){
+      answerArea='<div id="opts" style="display:flex;flex-direction:column;gap:9px;margin-bottom:12px;">'
+        +q.options.map(function(opt,i){
+          return '<button class="opt-btn" data-i="'+i+'" style="width:100%;padding:14px 16px;border-radius:14px;background:var(--card);border:2px solid var(--border);color:var(--text);font-family:inherit;font-size:15.5px;font-weight:500;cursor:pointer;text-align:left;">'
+            +'<span style="display:inline-block;width:24px;height:24px;line-height:24px;text-align:center;border-radius:7px;background:'+m.soft+';color:'+m.color+';font-weight:700;font-size:12px;margin-right:10px;">'+String.fromCharCode(65+i)+'</span>'+opt+'</button>';
+        }).join('')+'</div>';
+    } else {
+      answerArea='<div id="typewrap" style="margin-bottom:12px;">'
+        +'<input id="typein" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="type in German (cases matter!)" style="width:100%;padding:15px;border-radius:14px;border:2px solid var(--border);font-family:inherit;font-size:16px;color:var(--text);box-sizing:border-box;"/>'
+        +'<button id="typesub" style="margin-top:9px;width:100%;padding:14px;border-radius:14px;background:'+m.color+';color:#fff;border:none;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;">Check</button></div>';
+    }
+
+    app.innerHTML=
+      '<div class="fadeUp" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:6px;">'
+      +'<button id="backBtn" style="background:transparent;border:none;color:var(--muted);font-family:inherit;font-size:12px;cursor:pointer;padding:4px 0;">← Quit</button>'
+      +'<div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600;">'+m.name+' · '+(cur.idx+1)+'/'+m.count+'</div>'
+      +'<div style="font-size:12.5px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;">+'+cur.xpEarned+' XP</div></div>'
+      +'<div style="height:5px;background:rgba(128,128,128,.1);border-radius:6px;overflow:hidden;margin-bottom:6px;"><div style="height:100%;width:'+pct+'%;background:linear-gradient(90deg,'+m.color+',var(--accent2));border-radius:6px;transition:width .4s ease;"></div></div>'
+      +'<div id="timerbar" style="height:5px;background:rgba(128,128,128,.12);border-radius:6px;overflow:hidden;margin-bottom:16px;"><div id="timerfill" style="height:100%;width:100%;background:'+m.color+';border-radius:6px;"></div></div>'
+      +'<div class="pop" style="background:var(--card);border:1px solid var(--border);border-radius:18px;padding:20px 16px;text-align:center;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,.04);border-top:4px solid '+m.color+';">'
+      +'<div style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;">'+q.sub+' <span class="law-chip" style="background:'+m.soft+';color:'+m.color+';">'+(q.law||m.law)+'</span></div>'
+      + promptBlock + '</div>'
+      + answerArea
+      +'<div id="feedback" style="min-height:60px;"></div>';
+
+    document.getElementById('backBtn').addEventListener('click', renderDashboard);
+    if(q.isListen){ document.getElementById('playListen').addEventListener('click', function(e){ e.stopPropagation(); speak(q.speakText); }); setTimeout(function(){ speak(q.speakText); }, 450); }
+    if(q.type==='mc'){
+      app.querySelectorAll('.opt-btn').forEach(function(b){ b.addEventListener('click', function(){ resolve(q.options[parseInt(b.getAttribute('data-i'),10)], false); }); });
+    } else {
+      var inp=document.getElementById('typein');
+      setTimeout(function(){ try{ inp.focus(); }catch(e){} }, 80);
+      var sub=function(){ if(!cur.answered) resolve(inp.value, false); };
+      document.getElementById('typesub').addEventListener('click', sub);
+      inp.addEventListener('keydown', function(e){ if(e.key==='Enter'){ e.preventDefault(); sub(); } });
+    }
+    startTimer();
+  }
+
+  function startTimer(){
+    var fill=document.getElementById('timerfill');
+    timerId=setInterval(function(){
+      var left=CONFIG.TIME_LIMIT-(Date.now()-cur.qStart);
+      if(!fill){ clearTimer(); return; }
+      if(left<=0){ clearTimer(); if(fill) fill.style.width='0%'; resolve(null,true); return; }
+      var pct=(left/CONFIG.TIME_LIMIT)*100; fill.style.width=pct+'%';
+      fill.style.background = left<6000?'var(--bad)':left<11000?'var(--accent2)':MISSIONS[cur.key].color;
+    },120);
+  }
+
+  function resolve(chosen, timedOut){
+    if(cur.answered) return;
+    cur.answered=true; clearTimer();
+    var elapsed=Date.now()-cur.qStart;
+    var m=MISSIONS[cur.key];
+    var correct = timedOut?false:(q.type==='type'? matches(chosen, q.correct) : chosen===q.correct);
+
+    S.total.t++; if(correct) S.total.c++;
+    if(q.concept){ if(!S.stats[q.concept]) S.stats[q.concept]={c:0,t:0}; S.stats[q.concept].t++; if(correct) S.stats[q.concept].c++; }
+
+    if(q.type==='mc'){
+      var btns=app.querySelectorAll('.opt-btn');
+      btns.forEach(function(b,idx){
+        b.disabled=true; var opt=q.options[idx];
+        if(opt===q.correct){ b.style.background='var(--accent-soft)'; b.style.borderColor='var(--good)'; b.style.color='var(--good)'; }
+        else if(!correct && opt===chosen){ b.style.background='var(--bad-soft)'; b.style.borderColor='var(--bad)'; b.style.color='var(--bad)'; b.classList.add('shake'); }
+        else b.style.opacity='.45';
+      });
+    } else {
+      var inp=document.getElementById('typein');
+      if(inp){ inp.disabled=true; document.getElementById('typesub').disabled=true;
+        if(correct){ inp.style.borderColor='var(--good)'; inp.style.background='var(--accent-soft)'; }
+        else { inp.style.borderColor='var(--bad)'; inp.style.background='var(--bad-soft)'; inp.classList.add('shake'); } }
+    }
+
+    var fb=document.getElementById('feedback');
+    var ivNote = '';
+    if(correct){
+      cur.correct++;
+      var speed=(elapsed<6000)?3:0;
+      var gain=m.base+speed; cur.xpEarned+=gain;
+      sndCorrect();
+      if(q.cardKey){ var iv=gradeCard(q.cardKey, q.recap.correct, 4); ivNote=' <span style="color:var(--good);">· next review in '+iv+'d</span>'; }
+      fb.innerHTML='<div class="fadeUp" style="background:var(--accent-soft);border:1px solid var(--good);border-radius:14px;padding:11px 13px;display:flex;align-items:center;gap:10px;">'
+        +'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--good)" stroke-width="3" style="flex-shrink:0;"><path d="M20 6L9 17l-5-5"/></svg>'
+        +'<div style="flex:1;min-width:0;text-align:left;"><div style="font-weight:700;color:var(--good);font-size:14px;">Richtig! +'+gain+' XP'+(speed?' · speed':'')+ivNote+'</div>'
+        +'<div style="color:var(--muted);font-size:12px;margin-top:1px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span>'+q.explain+'</span><button class="speak-btn" id="speakF" style="width:26px;height:26px;border-radius:50%;border:1px solid var(--border);background:var(--card);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;">'+spkSVG(12)+'</button></div></div></div>';
+    } else {
+      cur.mistakes.push(q.recap);
+      sndWrong();
+      var iv2=gradeCard(q.recap.q, q.recap.correct, 2);
+      fb.innerHTML='<div class="fadeUp" style="background:var(--bad-soft);border:1px solid var(--bad);border-radius:14px;padding:11px 13px;display:flex;align-items:center;gap:10px;">'
+        +'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--bad)" stroke-width="3" style="flex-shrink:0;"><path d="M18 6L6 18M6 6l12 12"/></svg>'
+        +'<div style="flex:1;min-width:0;text-align:left;"><div style="font-weight:700;color:var(--bad);font-size:14px;">'+(timedOut?'Zeit abgelaufen':'Falsch')+' · SM-2: review in '+iv2+'d</div>'
+        +'<div style="color:var(--muted);font-size:12px;margin-top:1px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span>Correct: <strong style="color:var(--text);">'+q.correct+'</strong> — '+q.explain+'</span><button class="speak-btn" id="speakF" style="width:26px;height:26px;border-radius:50%;border:1px solid var(--border);background:var(--card);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;">'+spkSVG(12)+'</button></div></div></div>';
+    }
+    speak(q.speakText);
+    var sf=document.getElementById('speakF'); if(sf) sf.addEventListener('click', function(e){ e.stopPropagation(); speak(q.speakText); });
+
+    var feynmanHTML = '';
+    if(q.feynman){
+      feynmanHTML = '<div id="feynman" class="fadeUp" style="margin-top:10px;background:var(--blue-soft);border:1px solid var(--blue);border-radius:12px;padding:10px 12px;text-align:center;">'
+        +'<div style="font-size:12px;font-weight:600;color:var(--blue);margin-bottom:7px;">Gesetz 4 · Can you explain why? (source closed)</div>'
+        +'<div style="display:flex;gap:8px;justify-content:center;">'
+        +'<button id="fyYes" style="flex:1;max-width:140px;padding:8px;border-radius:10px;background:var(--good);color:#fff;border:none;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;">Ja, kann ich</button>'
+        +'<button id="fyNo" style="flex:1;max-width:140px;padding:8px;border-radius:10px;background:var(--card);color:var(--bad);border:1px solid var(--bad);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;">Noch nicht</button></div></div>';
+    }
+
+    var last=cur.idx>=m.count-1;
+    var nb=document.createElement('button');
+    nb.textContent=last?'Finish mission':'Next';
+    nb.className='fadeUp';
+    nb.style.cssText='margin-top:10px;width:100%;padding:13px;border-radius:14px;background:'+m.color+';color:#fff;border:none;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;';
+    nb.addEventListener('click', function(){ cur.idx++; if(last){ finishMission(); } else { renderQ(); } });
+    fb.insertAdjacentHTML('beforeend', feynmanHTML);
+    fb.appendChild(nb);
+
+    if(q.feynman){
+      document.getElementById('fyYes').addEventListener('click', function(){ var f=document.getElementById('feynman'); f.innerHTML='<div style="font-size:13px;font-weight:600;color:var(--good);padding:4px 0;">Super — solid chunk!</div>'; });
+      document.getElementById('fyNo').addEventListener('click', function(){
+        cur.mistakes.push(q.recap);
+        gradeCard(q.recap.q, q.recap.correct, 2);
+        save();
+        var f=document.getElementById('feynman'); f.innerHTML='<div style="font-size:13px;font-weight:600;color:var(--bad);padding:4px 0;">Added to SM-2 review — that gap is exactly what to fix.</div>';
+      });
+    }
+  }
+
+  function finishMission(){
+    clearTimer();
+    sndFinish();
+    var m=MISSIONS[cur.key];
+    var acc=Math.round((cur.correct/m.count)*100);
+    var stars=acc>=90?3:acc>=70?2:1;
+    S.xp+=cur.xpEarned;
+    var today=todayStr();
+    if(S.lastDay!==today){ if(S.lastDay && daysBetween(S.lastDay,today)===1){ S.streak++; } else { S.streak=1; } S.lastDay=today; }
+    if(!S.done[today]) S.done[today]={};
+    var prevStars=S.stars[today+'_'+cur.key]||0;
+    S.stars[today+'_'+cur.key]=Math.max(prevStars, stars);
+    S.done[today][cur.key]=true;
+    save();
+
+    var starsHTML=''; for(var i=0;i<3;i++){ starsHTML+='<span class="star earned" style="display:inline-block;">'+starSVG(i<stars?'var(--accent2)':'#cbd5e1')+'</span>'; }
+    var doneCount=MISSION_ORDER.filter(function(k){ return (S.done[today]||{})[k]; }).length;
+
+    app.innerHTML=
+      '<div class="fadeUp" style="text-align:center;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px 20px;box-shadow:0 2px 12px rgba(0,0,0,.05);border-top:4px solid '+m.color+';">'
+      +'<div style="font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:6px;">'+m.law+' · Mission complete</div>'
+      +'<h2 style="font-size:22px;font-weight:700;margin:0 0 10px;">'+m.name+' geschafft!</h2>'
+      +'<div style="display:flex;justify-content:center;gap:10px;margin-bottom:16px;">'+starsHTML+'</div>'
+      +'<div style="display:flex;gap:8px;justify-content:center;margin-bottom:18px;flex-wrap:wrap;">'
+      +'<div style="flex:1 1 75px;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:10px;"><div style="font-size:20px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;">+'+cur.xpEarned+'</div><div style="font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);">XP</div></div>'
+      +'<div style="flex:1 1 75px;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:10px;"><div style="font-size:20px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;">'+acc+'%</div><div style="font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);">Accuracy</div></div>'
+      +'<div style="flex:1 1 75px;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:10px;"><div style="font-size:20px;font-weight:700;color:var(--blue);font-variant-numeric:tabular-nums;">'+Object.keys(S.cards).length+'</div><div style="font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);">Cards</div></div></div>'
+      +(doneCount===N_MISSIONS?'<div class="newbest" style="background:var(--accent2-soft);border:1px solid var(--accent2);color:var(--accent2);padding:9px 12px;border-radius:12px;font-weight:600;font-size:13px;margin-bottom:14px;">Daily goal complete! Bis morgen. '+flameSVG()+'</div>':'<div style="color:var(--muted);font-size:12.5px;margin-bottom:14px;">'+(N_MISSIONS-doneCount)+' mission(s) left today.</div>')
+      +(cur.mistakes.length?('<div style="text-align:left;color:var(--muted);font-size:11.5px;margin-bottom:14px;">'+cur.mistakes.length+' item(s) scheduled by SM-2.</div>'):'')
+      +'<button id="dashBtn" style="width:100%;padding:14px;border-radius:14px;background:'+m.color+';color:#fff;border:none;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;margin-bottom:9px;">Back to dashboard</button>'
+      +(doneCount<N_MISSIONS?'<button id="nextMission" style="width:100%;padding:12px;border-radius:14px;background:var(--card);color:var(--text);border:1px solid var(--border);font-family:inherit;font-size:14px;font-weight:500;cursor:pointer;">Do next mission</button>':'')
+      +'</div>';
+
+    document.getElementById('dashBtn').addEventListener('click', renderDashboard);
+    var nm=document.getElementById('nextMission');
+    if(nm) nm.addEventListener('click', function(){ var next=MISSION_ORDER.find(function(k){ return !(S.done[todayStr()]||{})[k]; }); startMission(next||'bild'); });
+  }
+
+  document.addEventListener('keydown', function(e){
+    if(cur.answered && e.key==='Enter'){ var nb=document.querySelector('#feedback button:last-child'); if(nb && /(Next|Finish)/.test(nb.textContent)) nb.click(); return; }
+    if(!cur.answered && q && q.type==='mc' && document.activeElement.tagName!=='INPUT'){
+      var n=parseInt(e.key,10); if(n>=1 && n<=q.options.length){ var b=document.querySelectorAll('.opt-btn'); if(b[n-1]) b[n-1].click(); }
+    }
+  });
+
+  renderDashboard();
+})();
 </script>
-</body>
 </html>
